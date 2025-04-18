@@ -9,7 +9,11 @@ dart pub add better_auth_client
 
 ## Setup
 
+### Client Side
 This package is pure dart and does not require any native code. However, it uses [dio](https://pub.dev/packages/dio) for networking so make sure internet permission is enabled in android and macos.
+
+### Server Side
+This package requires [`bearer`](https://www.better-auth.com/docs/plugins/bearer) plugin to be enabled in your better auth server.
 
 ## Usage
 

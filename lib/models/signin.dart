@@ -1,5 +1,5 @@
 import 'package:better_auth_client/helpers/dio.dart';
-import 'package:better_auth_client/models/response/session_response.dart';
+import 'package:better_auth_client/models/response/social_sign_in_response.dart';
 import 'package:better_auth_client/models/response/user.dart';
 import 'package:better_auth_client/networking/response.dart';
 import 'package:dio/dio.dart';
@@ -9,7 +9,8 @@ enum Provider { apple, google, github, discord, facebook, kick, tiktok, twitch, 
 class Signin {
   final Dio _dio;
   final Function(String) _setToken;
-  Signin({required Dio dio, required Function(String) setToken}) : _dio = dio, _setToken = setToken;
+  String? _scheme;
+  Signin({required Dio dio, required Function(String) setToken, String? scheme}) : _dio = dio, _setToken = setToken, _scheme = scheme;
 
   Future<BetterAuthClientResponse<User, Exception>> email(String email, String password) async {
     try {
@@ -25,7 +26,7 @@ class Signin {
     }
   }
 
-  Future<BetterAuthClientResponse<SessionResponse, Exception>> signInWithAppleIdToken({required String token, String? nonce, String? accessToken}) async {
+  Future<BetterAuthClientResponse<SocialSignInResponse, Exception>> signInWithAppleIdToken({required String token, String? nonce, String? accessToken}) async {
     try {
       final response = await _dio.post(
         "/sign-in/social",
@@ -36,7 +37,7 @@ class Signin {
       );
       final body = response.data;
       _setToken(body["token"]);
-      return BetterAuthClientResponse(data: SessionResponse.fromJson(body), error: null);
+      return BetterAuthClientResponse(data: SocialSignInResponse.fromJson(body), error: null);
     } catch (e) {
       if (e is DioException) {
         return BetterAuthClientResponse(data: null, error: Exception(dioErrorToMessage(e)));
@@ -45,10 +46,17 @@ class Signin {
     }
   }
 
-  Future<BetterAuthClientResponse<dynamic, Exception>> social({required Provider provider}) async {
+  Future<BetterAuthClientResponse<SocialSignInResponse, Exception>> social({required Provider provider, String? callbackURL}) async {
     try {
-      final res = await _dio.post('/sign-in/social', data: {"provider": provider.toString().split(".").elementAt(1)});
-      return BetterAuthClientResponse(data: SessionResponse.fromJson(res.data), error: null);
+      if (_scheme == null) {
+        throw Exception("Scheme is not set. Please set the scheme in the BetterAuthClient constructor.");
+      }
+      final body = {"provider": provider.toString().split(".").elementAt(1)};
+      if (callbackURL != null) {
+        body["callbackURL"] = "$_scheme$callbackURL";
+      }
+      final res = await _dio.post('/sign-in/social', data: body, options: Options(headers: {"expo-origin": _scheme}));
+      return BetterAuthClientResponse(data: SocialSignInResponse.fromJson(res.data), error: null);
     } catch (e) {
       if (e is DioException) {
         return BetterAuthClientResponse(data: null, error: Exception(dioErrorToMessage(e)));

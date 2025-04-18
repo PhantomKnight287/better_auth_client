@@ -15,18 +15,22 @@ class BetterAuthClient {
   ///
   /// You can implement your own token store by extending the [TokenStore] class.
   final TokenStore tokenStore;
+
+  /// The Deep Link scheme of your app
+  /// This will be used to open the callback urls
+  String? scheme;
   late final Signup signUp;
   late final Signin signIn;
   late final Dio dio;
 
-  BetterAuthClient({required this.baseUrl, required this.tokenStore}) {
+  BetterAuthClient({required this.baseUrl, required this.tokenStore, this.scheme}) {
     _internal();
   }
 
   void _internal() {
     dio = generateDioClient(baseUrl);
     signUp = Signup(dio: dio, setToken: tokenStore.saveToken);
-    signIn = Signin(dio: dio, setToken: tokenStore.saveToken);
+    signIn = Signin(dio: dio, setToken: tokenStore.saveToken, scheme: scheme);
   }
 
   /// Sign out the user. This calls [TokenStore.saveToken] with null.
