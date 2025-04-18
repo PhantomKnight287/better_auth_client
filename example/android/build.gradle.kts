@@ -19,3 +19,10 @@ subprojects {
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
+
+buildscript{
+    ext.kotlin_version = "1.8.22"
+    dependencies{
+        classpath('com.android.tools.build:gradle:8.9.1')
+    }
+}

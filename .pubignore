@@ -2,3 +2,4 @@ build
 .idea
 .dart_tool
 test
+example

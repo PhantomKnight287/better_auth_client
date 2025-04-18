@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 String dioErrorToMessage(DioException e) {
   switch (e.type) {
     case DioExceptionType.badResponse:
-      return e.response?.data["message"] ?? "An unknown error occurred";
+      return e.response?.data?["message"] ?? "An unknown error occurred";
     case DioExceptionType.cancel:
       return "Request cancelled";
     case DioExceptionType.connectionError:

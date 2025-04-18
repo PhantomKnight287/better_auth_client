@@ -1,11 +1,13 @@
+import 'dart:async';
+
 import 'package:app_links/app_links.dart';
 import 'package:better_auth_client/models/client.dart';
 import 'package:better_auth_client/models/signin.dart';
 import 'package:better_auth_client/models/token_store.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 class SharedPreferencesTokenStore extends TokenStore {
   @override
@@ -27,17 +29,79 @@ final appLinks = AppLinks();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   betterAuthClient = BetterAuthClient(tokenStore: SharedPreferencesTokenStore(), baseUrl: "http://localhost:3000/api/auth", scheme: "bac://");
-  appLinks.uriLinkStream.listen((uri) {
-    print(uri);
-  });
-  appLinks.stringLinkStream.listen((link) {
-    print(link);
-  });
   runApp(const MainApp());
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   const MainApp({super.key});
+
+  @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
+  StreamSubscription<Uri>? _linkSubscription;
+  bool _isInForeground = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    initAppLinks();
+  }
+
+  Future<void> initAppLinks() async {
+    // Handle app start with a link
+    final appLinkUri = await appLinks.getInitialLink();
+    if (appLinkUri != null) {
+      handleAppLink(appLinkUri);
+    }
+
+    _linkSubscription = appLinks.uriLinkStream.listen(
+      (Uri uri) {
+        handleAppLink(uri);
+      },
+      onError: (err) {
+        print('Error processing app link: $err');
+      },
+    );
+  }
+
+  void handleAppLink(Uri uri) {
+    print(uri);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    if (state == AppLifecycleState.resumed) {
+      // App has come back to the foreground
+      if (!_isInForeground) {
+        _isInForeground = true;
+        print('App resumed from background, checking for deep links...');
+
+        // Check for any pending deep links
+        appLinks.getLatestLink().then((Uri? uri) {
+          if (uri != null) {
+            print('Found pending deep link on resume');
+            handleAppLink(uri);
+          }
+        });
+      }
+    } else if (state == AppLifecycleState.paused) {
+      // App has gone to the background
+      _isInForeground = false;
+      print('App paused (went to background)');
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _linkSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,17 +110,12 @@ class MainApp extends StatelessWidget {
         body: Center(
           child: ElevatedButton(
             onPressed: () async {
-              final res = await betterAuthClient.signIn.social(provider: Provider.github, callbackURL: "details");
-              print(res.error);
+              final res = await betterAuthClient.signIn.social(provider: Provider.github, callbackURL: "/details", errorCallbackURL: "/error");
               if (res.data == null) return;
               final url = Uri.parse(res.data!.url);
-
-              await launchUrl(
-                url,
-                mode: LaunchMode.externalApplication,
-                webViewConfiguration: WebViewConfiguration(enableJavaScript: true),
-                browserConfiguration: BrowserConfiguration(showTitle: true),
-              );
+              final result = await FlutterWebAuth2.authenticate(url: url.toString(), callbackUrlScheme: "bac", options: FlutterWebAuth2Options());
+              final resultUrl = Uri.parse(result);
+              await launchUrl(resultUrl, mode: LaunchMode.externalApplication);
             },
             child: Text("Sign in with github"),
           ),

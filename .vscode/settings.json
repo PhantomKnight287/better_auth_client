@@ -1,5 +1,6 @@
 {
   "[dart]": {
     "editor.inlayHints.enabled": "on"
-  }
+  },
+  "cmake.ignoreCMakeListsMissing": true
 }
