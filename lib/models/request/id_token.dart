@@ -10,7 +10,8 @@ class IdToken {
 
   IdToken({required this.token, this.nonce, this.accessToken});
 
-  factory IdToken.fromJson(Map<String, dynamic> json) => _$IdTokenFromJson(json);
+  factory IdToken.fromJson(Map<String, dynamic> json) =>
+      _$IdTokenFromJson(json);
 
   Map<String, dynamic> toJson() => _$IdTokenToJson(this);
 }

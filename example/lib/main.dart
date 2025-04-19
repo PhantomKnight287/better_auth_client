@@ -28,7 +28,11 @@ final appLinks = AppLinks();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  betterAuthClient = BetterAuthClient(tokenStore: SharedPreferencesTokenStore(), baseUrl: "http://localhost:3000/api/auth", scheme: "bac://");
+  betterAuthClient = BetterAuthClient(
+    tokenStore: SharedPreferencesTokenStore(),
+    baseUrl: "http://localhost:3000/api/auth",
+    scheme: "bac://",
+  );
   runApp(const MainApp());
 }
 
@@ -110,10 +114,18 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
         body: Center(
           child: ElevatedButton(
             onPressed: () async {
-              final res = await betterAuthClient.signIn.social(provider: Provider.github, callbackURL: "/details", errorCallbackURL: "/error");
+              final res = await betterAuthClient.signIn.social(
+                provider: Provider.github,
+                callbackURL: "/details",
+                errorCallbackURL: "/error",
+              );
               if (res.data == null) return;
               final url = Uri.parse(res.data!.url);
-              final result = await FlutterWebAuth2.authenticate(url: url.toString(), callbackUrlScheme: "bac", options: FlutterWebAuth2Options());
+              final result = await FlutterWebAuth2.authenticate(
+                url: url.toString(),
+                callbackUrlScheme: "bac",
+                options: FlutterWebAuth2Options(),
+              );
               final resultUrl = Uri.parse(result);
               await launchUrl(resultUrl, mode: LaunchMode.externalApplication);
             },

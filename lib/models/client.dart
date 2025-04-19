@@ -23,7 +23,11 @@ class BetterAuthClient {
   late final Signin signIn;
   late final Dio dio;
 
-  BetterAuthClient({required this.baseUrl, required this.tokenStore, this.scheme}) {
+  BetterAuthClient({
+    required this.baseUrl,
+    required this.tokenStore,
+    this.scheme,
+  }) {
     _internal();
   }
 
@@ -44,9 +48,15 @@ class BetterAuthClient {
   }
 
   /// Send a verification email to the user.
-  Future<BetterAuthClientResponse<void, Exception>> sendVerificationEmail(String email, {String? callbackURL}) async {
+  Future<BetterAuthClientResponse<void, Exception>> sendVerificationEmail(
+    String email, {
+    String? callbackURL,
+  }) async {
     try {
-      await dio.post("$baseUrl/send-verification-email", data: {"email": email, "callbackURL": callbackURL});
+      await dio.post(
+        "$baseUrl/send-verification-email",
+        data: {"email": email, "callbackURL": callbackURL},
+      );
       return BetterAuthClientResponse(data: null, error: null);
     } catch (e) {
       return BetterAuthClientResponse(data: null, error: e as Exception);
@@ -54,9 +64,15 @@ class BetterAuthClient {
   }
 
   /// Send a forgot password email to the user.
-  Future<BetterAuthClientResponse<void, Exception>> forgetPassword(String email, {String? callbackURL}) async {
+  Future<BetterAuthClientResponse<void, Exception>> forgetPassword(
+    String email, {
+    String? callbackURL,
+  }) async {
     try {
-      await dio.post("$baseUrl/forget-password", data: {"email": email, "callbackURL": callbackURL});
+      await dio.post(
+        "$baseUrl/forget-password",
+        data: {"email": email, "callbackURL": callbackURL},
+      );
       return BetterAuthClientResponse(data: null, error: null);
     } catch (e) {
       return BetterAuthClientResponse(data: null, error: e as Exception);
@@ -66,9 +82,15 @@ class BetterAuthClient {
   /// Reset the password of the user.
   ///
   /// [token] is the token that was sent to the user's email.
-  Future<BetterAuthClientResponse<void, Exception>> resetPassword(String token, String newPassword) async {
+  Future<BetterAuthClientResponse<void, Exception>> resetPassword(
+    String token,
+    String newPassword,
+  ) async {
     try {
-      await dio.post("$baseUrl/reset-password", data: {"token": token, "newPassword": newPassword});
+      await dio.post(
+        "$baseUrl/reset-password",
+        data: {"token": token, "newPassword": newPassword},
+      );
       return BetterAuthClientResponse(data: null, error: null);
     } catch (e) {
       return BetterAuthClientResponse(data: null, error: e as Exception);

@@ -11,7 +11,8 @@ class SessionResponse {
 
   SessionResponse({required this.session, required this.user});
 
-  factory SessionResponse.fromJson(Map<String, dynamic> json) => _$SessionResponseFromJson(json);
+  factory SessionResponse.fromJson(Map<String, dynamic> json) =>
+      _$SessionResponseFromJson(json);
 
   Map<String, dynamic> toJson() => _$SessionResponseToJson(this);
 }

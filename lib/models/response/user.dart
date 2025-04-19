@@ -12,7 +12,15 @@ class User {
   final DateTime updatedAt;
   final bool? isEmailVerified;
 
-  User({required this.id, required this.email, required this.name, this.image, required this.createdAt, required this.updatedAt, this.isEmailVerified});
+  User({
+    required this.id,
+    required this.email,
+    required this.name,
+    this.image,
+    required this.createdAt,
+    required this.updatedAt,
+    this.isEmailVerified,
+  });
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
   Map<String, dynamic> toJson() => _$UserToJson(this);

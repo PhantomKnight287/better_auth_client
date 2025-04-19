@@ -5,7 +5,25 @@ import 'package:better_auth_client/models/response/user.dart';
 import 'package:better_auth_client/networking/response.dart';
 import 'package:dio/dio.dart';
 
-enum Provider { apple, google, github, discord, facebook, kick, tiktok, twitch, twitter, dropdox, linkedin, gitlab, reddit, roblox, spotify, vk, zoom }
+enum Provider {
+  apple,
+  google,
+  github,
+  discord,
+  facebook,
+  kick,
+  tiktok,
+  twitch,
+  twitter,
+  dropdox,
+  linkedin,
+  gitlab,
+  reddit,
+  roblox,
+  spotify,
+  vk,
+  zoom,
+}
 
 extension ProviderId on Provider {
   String get id {
@@ -16,38 +34,38 @@ extension ProviderId on Provider {
 class Signin {
   final Dio _dio;
   final Function(String) _setToken;
-  String? _scheme;
-  Signin({required Dio dio, required Function(String) setToken, String? scheme}) : _dio = dio, _setToken = setToken, _scheme = scheme;
+  final String? _scheme;
+  Signin({required Dio dio, required Function(String) setToken, String? scheme})
+    : _dio = dio,
+      _setToken = setToken,
+      _scheme = scheme;
 
-  Future<BetterAuthClientResponse<User, Exception>> email(String email, String password) async {
-    try {
-      final response = await _dio.post("/sign-in/email", data: {"email": email, "password": password});
-      final body = response.data;
-      _setToken(body["token"]);
-      return BetterAuthClientResponse(data: User.fromJson(body["user"]), error: null);
-    } catch (e) {
-      if (e is DioException) {
-        return BetterAuthClientResponse(data: null, error: Exception(dioErrorToMessage(e)));
-      }
-      return BetterAuthClientResponse(data: null, error: e as Exception);
-    }
-  }
-
-  Future<BetterAuthClientResponse<SocialSignInResponse, Exception>> signInWithAppleIdToken({required String token, String? nonce, String? accessToken}) async {
+  /// Sign in with email and password
+  ///
+  /// [email] The email of the user
+  ///
+  /// [password] The password of the user
+  Future<BetterAuthClientResponse<User, Exception>> email(
+    String email,
+    String password,
+  ) async {
     try {
       final response = await _dio.post(
-        "/sign-in/social",
-        data: {
-          "provider": "apple",
-          "idToken": {"token": token, "nonce": nonce, "accessToken": accessToken},
-        },
+        "/sign-in/email",
+        data: {"email": email, "password": password},
       );
       final body = response.data;
       _setToken(body["token"]);
-      return BetterAuthClientResponse(data: SocialSignInResponse.fromJson(body), error: null);
+      return BetterAuthClientResponse(
+        data: User.fromJson(body["user"]),
+        error: null,
+      );
     } catch (e) {
       if (e is DioException) {
-        return BetterAuthClientResponse(data: null, error: Exception(dioErrorToMessage(e)));
+        return BetterAuthClientResponse(
+          data: null,
+          error: Exception(dioErrorToMessage(e)),
+        );
       }
       return BetterAuthClientResponse(data: null, error: e as Exception);
     }
@@ -76,35 +94,57 @@ class Signin {
   }) async {
     try {
       if (_scheme == null) {
-        throw Exception("Scheme is not set. Please set the scheme in the BetterAuthClient constructor.");
+        throw Exception(
+          "Scheme is not set. Please set the scheme in the BetterAuthClient constructor.",
+        );
       }
       final body = {"provider": provider.id};
       if (callbackURL != null) {
         body["callbackURL"] = "$_scheme$callbackURL";
       }
-      final res = await _dio.post('/sign-in/social', data: body, options: Options(headers: {"expo-origin": _scheme}));
-      return BetterAuthClientResponse(data: SocialSignInResponse.fromJson(res.data), error: null);
+      final res = await _dio.post(
+        '/sign-in/social',
+        data: body,
+        options: Options(headers: {"expo-origin": _scheme}),
+      );
+      return BetterAuthClientResponse(
+        data: SocialSignInResponse.fromJson(res.data),
+        error: null,
+      );
     } catch (e) {
       if (e is DioException) {
-        return BetterAuthClientResponse(data: null, error: Exception(dioErrorToMessage(e)));
+        return BetterAuthClientResponse(
+          data: null,
+          error: Exception(dioErrorToMessage(e)),
+        );
       }
       return BetterAuthClientResponse(data: null, error: e as Exception);
     }
   }
 
-  Future<BetterAuthClientResponse<dynamic, Exception>> socialWithIdToken({required String code, String? state, required Provider provider}) async {
+  Future<BetterAuthClientResponse<dynamic, Exception>> socialWithIdToken({
+    required String code,
+    String? state,
+    required Provider provider,
+  }) async {
     try {
       final queryParameters = {"code": code};
       if (state != null) {
         queryParameters["state"] = state;
       }
-      final response = await _dio.post("/callback/${provider.id}", queryParameters: queryParameters);
+      final response = await _dio.post(
+        "/callback/${provider.id}",
+        queryParameters: queryParameters,
+      );
       final body = response.data;
       // _setToken(body["token"]);
       return BetterAuthClientResponse(data: body, error: null);
     } catch (e) {
       if (e is DioException) {
-        return BetterAuthClientResponse(data: null, error: Exception(dioErrorToMessage(e)));
+        return BetterAuthClientResponse(
+          data: null,
+          error: Exception(dioErrorToMessage(e)),
+        );
       }
       return BetterAuthClientResponse(data: null, error: e as Exception);
     }
