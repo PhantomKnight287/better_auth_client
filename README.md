@@ -1,6 +1,10 @@
 <h1 align="center">Better Auth Client</h1>
 <p align="center">A pure dart client package for <a href="https://better-auth.com">Better Auth</a></p>
 
+<div align="center">
+Note: This repo will get most if not all of the updates on weekends or public holidays in India. I am unable to dedicate time to this out of my daily full time working schedule.
+</div>
+
 ## Installation
 
 ```bash
