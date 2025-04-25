@@ -17,7 +17,13 @@ class Signin {
   final Dio _dio;
   final Function(String) _setToken;
   final String? _scheme;
-  Signin({required Dio dio, required Function(String) setToken, String? scheme}) : _dio = dio, _setToken = setToken, _scheme = scheme;
+  final User Function(Map<String, dynamic>)? _fromJsonUser;
+
+  Signin({required Dio dio, required Function(String) setToken, String? scheme, User Function(Map<String, dynamic>)? fromJsonUser})
+    : _dio = dio,
+      _setToken = setToken,
+      _scheme = scheme,
+      _fromJsonUser = fromJsonUser;
 
   /// Sign in with email and password
   ///
@@ -29,7 +35,11 @@ class Signin {
       final response = await _dio.post("/sign-in/email", data: {"email": email, "password": password});
       final body = response.data;
       _setToken(body["token"]);
-      return BetterAuthClientResponse(data: User.fromJson(body["user"]), error: null);
+
+      // Use custom fromJson if provided, otherwise use default User.fromJson
+      final user = _fromJsonUser != null ? _fromJsonUser!(body["user"]) : User.fromJson(body["user"]);
+
+      return BetterAuthClientResponse(data: user, error: null);
     } catch (e) {
       if (e is DioException) {
         return BetterAuthClientResponse(data: null, error: Exception(dioErrorToMessage(e)));

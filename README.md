@@ -70,3 +70,121 @@ The API of this package is similar to that of Better Auth's JS Client.
 
 This package does not handle oauth redirects. You have to handle it yourself using [`flutter_web_auth_2`](https://pub.dev/packages/flutter_web_auth_2) or any other package you prefer.
 
+## Custom User Models
+
+Better Auth Client allows you to customize the User model to include additional properties returned by your server. There are three approaches you can use:
+
+### Approach 1: Dynamic Map
+
+This approach automatically collects all non-standard properties into a `customProperties` map.
+
+```dart
+// Sign in to get a user with custom properties
+final response = await client.signIn.email("test@example.com", "password");
+final user = response.data;
+
+// Access custom properties
+final customValue = user?.customProperties["customField"];
+
+final typedValue = user?.getCustomProperty<String>("customField");
+```
+
+### Approach 2: Custom User Factory
+
+This approach allows you to provide your own custom User class:
+
+```dart
+// Define your custom user class
+class CustomUser extends User {
+  final String customField;
+  
+  CustomUser({
+    required super.id,
+    required super.email,
+    required super.name,
+    super.image,
+    required super.createdAt,
+    required super.updatedAt,
+    super.isEmailVerified,
+    required this.customField,
+  });
+  
+  factory CustomUser.fromJson(Map<String, dynamic> json) {
+    // Create base user
+    final baseUser = User.fromJson(json);
+    
+    // Return custom user with additional fields
+    return CustomUser(
+      id: baseUser.id,
+      email: baseUser.email,
+      name: baseUser.name,
+      image: baseUser.image,
+      createdAt: baseUser.createdAt,
+      updatedAt: baseUser.updatedAt,
+      isEmailVerified: baseUser.isEmailVerified,
+      customField: json['customField'],
+    );
+  }
+}
+
+// Initialize client with custom user factory
+final client = BetterAuthClient(
+  baseUrl: "https://api.example.com",
+  tokenStore: myTokenStore,
+  fromJsonUser: CustomUser.fromJson,
+);
+
+// Now responses will use your custom user type
+final response = await client.signIn.email("test@example.com", "password");
+final user = response.data as CustomUser;
+print(user.customField);
+```
+
+### Approach 3: Extending the Base User Class
+
+Use the `ExtendableUser` class for a cleaner inheritance approach:
+
+```dart
+class CustomUser extends ExtendableUser {
+  final String customField;
+  
+  CustomUser({
+    required super.id,
+    required super.email,
+    required super.name,
+    super.image,
+    required super.createdAt,
+    required super.updatedAt,
+    super.isEmailVerified,
+    required this.customField,
+  });
+  
+  factory CustomUser.fromJson(Map<String, dynamic> json) {
+    return CustomUser(
+      id: json['id'],
+      email: json['email'],
+      name: json['name'],
+      image: json['image'],
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedAt: DateTime.parse(json['updatedAt']),
+      isEmailVerified: json['isEmailVerified'],
+      customField: json['customField'],
+    );
+  }
+  
+  @override
+  Map<String, dynamic> toJson() {
+    final json = super.toJson();
+    json['customField'] = customField;
+    return json;
+  }
+}
+
+// Initialize client with custom user factory
+final client = BetterAuthClient(
+  baseUrl: "https://api.example.com",
+  tokenStore: myTokenStore,
+  fromJsonUser: CustomUser.fromJson,
+);
+```
+
