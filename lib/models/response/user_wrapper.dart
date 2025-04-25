@@ -7,7 +7,10 @@ class UserWrapper<T extends User> {
 
   UserWrapper({required this.user, required this.token});
 
-  factory UserWrapper.fromJson(Map<String, dynamic> json, T Function(Map<String, dynamic>) fromJsonT) {
+  factory UserWrapper.fromJson(
+    Map<String, dynamic> json,
+    T Function(Map<String, dynamic>) fromJsonT,
+  ) {
     return UserWrapper(user: fromJsonT(json['user']), token: json['token']);
   }
 

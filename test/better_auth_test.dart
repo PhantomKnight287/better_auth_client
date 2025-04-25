@@ -32,7 +32,10 @@ Future<void> openUrl(String url) async {
 }
 
 void main() async {
-  final client = BetterAuthClient(baseUrl: "http://localhost:3000/api/auth", tokenStore: InMemoryTokenStore());
+  final client = BetterAuthClient(
+    baseUrl: "http://localhost:3000/api/auth",
+    tokenStore: InMemoryTokenStore(),
+  );
 
   final response = await client.signIn.social(provider: Provider.github);
 

@@ -15,16 +15,34 @@ class User {
   /// Custom properties that don't fit in the standard model
   final Map<String, dynamic> customProperties;
 
-  User({required this.id, required this.email, required this.name, this.image, required this.createdAt, required this.updatedAt, this.isEmailVerified, Map<String, dynamic>? customProperties})
-    : this.customProperties = customProperties ?? {};
+  User({
+    required this.id,
+    required this.email,
+    required this.name,
+    this.image,
+    required this.createdAt,
+    required this.updatedAt,
+    this.isEmailVerified,
+    Map<String, dynamic>? customProperties,
+  }) : this.customProperties = customProperties ?? {};
 
   factory User.fromJson(Map<String, dynamic> json) {
     // Create a copy of the json to avoid modifying the original
     final jsonCopy = Map<String, dynamic>.from(json);
 
     // Remove standard fields so we can collect the remaining as custom properties
-    final standardFields = ['id', 'email', 'name', 'image', 'createdAt', 'updatedAt', 'isEmailVerified'];
-    final customProps = Map<String, dynamic>.fromEntries(jsonCopy.entries.where((entry) => !standardFields.contains(entry.key)));
+    final standardFields = [
+      'id',
+      'email',
+      'name',
+      'image',
+      'createdAt',
+      'updatedAt',
+      'isEmailVerified',
+    ];
+    final customProps = Map<String, dynamic>.fromEntries(
+      jsonCopy.entries.where((entry) => !standardFields.contains(entry.key)),
+    );
 
     // Add custom properties to json so it gets included in the generated model
     jsonCopy['customProperties'] = customProps;

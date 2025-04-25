@@ -2,7 +2,15 @@ import 'package:better_auth_client/models/response/user.dart';
 
 /// A base class that allows you to extend the User model with custom properties
 abstract class ExtendableUser extends User {
-  ExtendableUser({required super.id, required super.email, required super.name, super.image, required super.createdAt, required super.updatedAt, super.isEmailVerified});
+  ExtendableUser({
+    required super.id,
+    required super.email,
+    required super.name,
+    super.image,
+    required super.createdAt,
+    required super.updatedAt,
+    super.isEmailVerified,
+  });
 
   /// Factory method to create a specific user type from json
   /// Override this in your custom user class
