@@ -14,6 +14,7 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
   createdAt: DateTime.parse(json['createdAt'] as String),
   updatedAt: DateTime.parse(json['updatedAt'] as String),
   isEmailVerified: json['isEmailVerified'] as bool?,
+  customProperties: json['customProperties'] as Map<String, dynamic>?,
 );
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
@@ -24,4 +25,5 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
   'createdAt': instance.createdAt.toIso8601String(),
   'updatedAt': instance.updatedAt.toIso8601String(),
   'isEmailVerified': instance.isEmailVerified,
+  'customProperties': instance.customProperties,
 };

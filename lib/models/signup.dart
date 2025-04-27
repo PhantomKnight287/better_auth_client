@@ -3,34 +3,26 @@ import 'package:better_auth_client/models/response/user.dart';
 import 'package:better_auth_client/networking/response.dart';
 import 'package:dio/dio.dart';
 
-class Signup {
+class Signup<T extends User> {
   final Dio _dio;
   final Function(String) _setToken;
-  final User Function(Map<String, dynamic>)? _fromJsonUser;
+  final T Function(Map<String, dynamic>)? _fromJsonUser;
 
-  Signup({
-    required Dio dio,
-    required Function(String) setToken,
-    User Function(Map<String, dynamic>)? fromJsonUser,
-  }) : _dio = dio,
-       _setToken = setToken,
-       _fromJsonUser = fromJsonUser;
+  Signup({required Dio dio, required Function(String) setToken, T Function(Map<String, dynamic>)? fromJsonUser})
+    : _dio = dio,
+      _setToken = setToken,
+      _fromJsonUser = fromJsonUser;
 
-  Future<BetterAuthClientResponse<User, Exception>> email(
-    String email,
-    String password,
-    String name, {
+  Future<BetterAuthClientResponse<T, Exception>> email({
+    required String name,
+    required String email,
+    required String password,
     String? image,
   }) async {
     try {
       final response = await _dio.post(
         "/sign-up/email",
-        data: {
-          "email": email,
-          "password": password,
-          "name": name,
-          "image": image,
-        },
+        data: {"email": email, "password": password, "name": name, "image": image},
       );
       final body = response.data;
       _setToken(body["token"]);
@@ -39,15 +31,12 @@ class Signup {
       final user =
           _fromJsonUser != null
               ? _fromJsonUser!(body["user"])
-              : User.fromJson(body["user"]);
+              : throw Exception("Custom fromJsonUser function is required when using a custom User type");
 
       return BetterAuthClientResponse(data: user, error: null);
     } catch (e) {
       if (e is DioException) {
-        return BetterAuthClientResponse(
-          data: null,
-          error: Exception(dioErrorToMessage(e)),
-        );
+        return BetterAuthClientResponse(data: null, error: Exception(dioErrorToMessage(e)));
       }
       return BetterAuthClientResponse(data: null, error: e as Exception);
     }

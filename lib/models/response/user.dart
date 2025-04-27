@@ -27,24 +27,13 @@ class User {
   }) : this.customProperties = customProperties ?? {};
 
   factory User.fromJson(Map<String, dynamic> json) {
-    // Create a copy of the json to avoid modifying the original
     final jsonCopy = Map<String, dynamic>.from(json);
 
-    // Remove standard fields so we can collect the remaining as custom properties
-    final standardFields = [
-      'id',
-      'email',
-      'name',
-      'image',
-      'createdAt',
-      'updatedAt',
-      'isEmailVerified',
-    ];
+    final standardFields = ['id', 'email', 'name', 'image', 'createdAt', 'updatedAt', 'isEmailVerified'];
     final customProps = Map<String, dynamic>.fromEntries(
       jsonCopy.entries.where((entry) => !standardFields.contains(entry.key)),
     );
 
-    // Add custom properties to json so it gets included in the generated model
     jsonCopy['customProperties'] = customProps;
 
     return _$UserFromJson(jsonCopy);

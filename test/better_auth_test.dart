@@ -1,14 +1,47 @@
 import 'package:better_auth_client/models/client.dart';
-import 'package:better_auth_client/models/signin.dart';
+import 'package:better_auth_client/models/response/extendable_user.dart';
 import 'package:better_auth_client/models/token_store.dart';
-import 'package:test/test.dart';
 import 'dart:io';
+
+class PremiumUser extends ExtendableUser {
+  final bool premium;
+
+  PremiumUser({
+    required super.id,
+    required super.email,
+    required super.name,
+    super.image,
+    required super.createdAt,
+    required super.updatedAt,
+    super.isEmailVerified,
+    required this.premium,
+  });
+
+  factory PremiumUser.fromJson(Map<String, dynamic> json) => PremiumUser(
+    id: json['id'],
+    email: json['email'],
+    name: json['name'],
+    image: json['image'],
+    createdAt: json['createdAt'],
+    updatedAt: json['updatedAt'],
+    isEmailVerified: json['isEmailVerified'],
+    premium: json['premium'],
+  );
+
+  @override
+  Map<String, dynamic> toJson() {
+    final json = super.toJson();
+    json['premium'] = premium;
+    return json;
+  }
+}
 
 class InMemoryTokenStore extends TokenStore {
   String? _token;
 
   @override
   Future<String> getToken() {
+    print("Getting token: $_token");
     return Future.value(_token ?? "");
   }
 
@@ -32,35 +65,19 @@ Future<void> openUrl(String url) async {
 }
 
 void main() async {
-  final client = BetterAuthClient(
+  final client = BetterAuthClient<PremiumUser>(
     baseUrl: "http://localhost:3000/api/auth",
     tokenStore: InMemoryTokenStore(),
+    fromJsonUser: PremiumUser.fromJson,
   );
 
-  final response = await client.signIn.social(provider: Provider.github);
+  final response = await client.signIn.email(email: 'test@mail.com', password: 'password');
 
   if (response.error != null) {
     throw response.error!;
   } else {
-    final url = response.data?.url;
-    if (url != null) {
-      print('Opening browser for authentication...');
-      try {
-        await openUrl(url);
-
-        // Wait for user to complete authentication
-        print('Please complete the authentication in your browser...');
-        print('Press Enter when done...');
-        await stdin.readLineSync();
-
-        // After authentication, print the response
-        print('Authentication response:');
-        print(response.data);
-      } catch (e) {
-        print('Error opening URL: $e');
-      }
-    } else {
-      print('No authentication URL found in response');
-    }
+    print(response.data);
   }
+  final session = await client.getSession();
+  print(session.error);
 }

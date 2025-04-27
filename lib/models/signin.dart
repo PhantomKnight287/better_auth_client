@@ -31,17 +31,17 @@ extension ProviderId on Provider {
   }
 }
 
-class Signin {
+class Signin<T extends User> {
   final Dio _dio;
   final Function(String) _setToken;
   final String? _scheme;
-  final User Function(Map<String, dynamic>)? _fromJsonUser;
+  final T Function(Map<String, dynamic>)? _fromJsonUser;
 
   Signin({
     required Dio dio,
     required Function(String) setToken,
     String? scheme,
-    User Function(Map<String, dynamic>)? fromJsonUser,
+    T Function(Map<String, dynamic>)? fromJsonUser,
   }) : _dio = dio,
        _setToken = setToken,
        _scheme = scheme,
@@ -52,15 +52,9 @@ class Signin {
   /// [email] The email of the user
   ///
   /// [password] The password of the user
-  Future<BetterAuthClientResponse<User, Exception>> email(
-    String email,
-    String password,
-  ) async {
+  Future<BetterAuthClientResponse<T, Exception>> email({required String email, required String password}) async {
     try {
-      final response = await _dio.post(
-        "/sign-in/email",
-        data: {"email": email, "password": password},
-      );
+      final response = await _dio.post("/sign-in/email", data: {"email": email, "password": password});
       final body = response.data;
       _setToken(body["token"]);
 
@@ -68,15 +62,12 @@ class Signin {
       final user =
           _fromJsonUser != null
               ? _fromJsonUser!(body["user"])
-              : User.fromJson(body["user"]);
+              : throw Exception("Custom fromJsonUser function is required when using a custom User type");
 
       return BetterAuthClientResponse(data: user, error: null);
     } catch (e) {
       if (e is DioException) {
-        return BetterAuthClientResponse(
-          data: null,
-          error: Exception(dioErrorToMessage(e)),
-        );
+        return BetterAuthClientResponse(data: null, error: Exception(dioErrorToMessage(e)));
       }
       return BetterAuthClientResponse(data: null, error: e as Exception);
     }
@@ -105,29 +96,17 @@ class Signin {
   }) async {
     try {
       if (_scheme == null) {
-        throw Exception(
-          "Scheme is not set. Please set the scheme in the BetterAuthClient constructor.",
-        );
+        throw Exception("Scheme is not set. Please set the scheme in the BetterAuthClient constructor.");
       }
       final body = {"provider": provider.id};
       if (callbackURL != null) {
         body["callbackURL"] = "$_scheme$callbackURL";
       }
-      final res = await _dio.post(
-        '/sign-in/social',
-        data: body,
-        options: Options(headers: {"expo-origin": _scheme}),
-      );
-      return BetterAuthClientResponse(
-        data: SocialSignInResponse.fromJson(res.data),
-        error: null,
-      );
+      final res = await _dio.post('/sign-in/social', data: body, options: Options(headers: {"expo-origin": _scheme}));
+      return BetterAuthClientResponse(data: SocialSignInResponse.fromJson(res.data), error: null);
     } catch (e) {
       if (e is DioException) {
-        return BetterAuthClientResponse(
-          data: null,
-          error: Exception(dioErrorToMessage(e)),
-        );
+        return BetterAuthClientResponse(data: null, error: Exception(dioErrorToMessage(e)));
       }
       return BetterAuthClientResponse(data: null, error: e as Exception);
     }

@@ -89,58 +89,7 @@ final customValue = user?.customProperties["customField"];
 final typedValue = user?.getCustomProperty<String>("customField");
 ```
 
-### Approach 2: Custom User Factory
-
-This approach allows you to provide your own custom User class:
-
-```dart
-// Define your custom user class
-class CustomUser extends User {
-  final String customField;
-  
-  CustomUser({
-    required super.id,
-    required super.email,
-    required super.name,
-    super.image,
-    required super.createdAt,
-    required super.updatedAt,
-    super.isEmailVerified,
-    required this.customField,
-  });
-  
-  factory CustomUser.fromJson(Map<String, dynamic> json) {
-    // Create base user
-    final baseUser = User.fromJson(json);
-    
-    // Return custom user with additional fields
-    return CustomUser(
-      id: baseUser.id,
-      email: baseUser.email,
-      name: baseUser.name,
-      image: baseUser.image,
-      createdAt: baseUser.createdAt,
-      updatedAt: baseUser.updatedAt,
-      isEmailVerified: baseUser.isEmailVerified,
-      customField: json['customField'],
-    );
-  }
-}
-
-// Initialize client with custom user factory
-final client = BetterAuthClient(
-  baseUrl: "https://api.example.com",
-  tokenStore: myTokenStore,
-  fromJsonUser: CustomUser.fromJson,
-);
-
-// Now responses will use your custom user type
-final response = await client.signIn.email("test@example.com", "password");
-final user = response.data as CustomUser;
-print(user.customField);
-```
-
-### Approach 3: Extending the Base User Class
+### Approach 2: Extending the Base User Class
 
 Use the `ExtendableUser` class for a cleaner inheritance approach:
 
