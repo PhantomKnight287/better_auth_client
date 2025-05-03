@@ -10,7 +10,6 @@ class ChangePasswordResponse {
 
   ChangePasswordResponse({required this.user, required this.token});
 
-  factory ChangePasswordResponse.fromJson(Map<String, dynamic> json) =>
-      _$ChangePasswordResponseFromJson(json);
+  factory ChangePasswordResponse.fromJson(Map<String, dynamic> json) => _$ChangePasswordResponseFromJson(json);
   Map<String, dynamic> toJson() => _$ChangePasswordResponseToJson(this);
 }

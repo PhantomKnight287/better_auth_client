@@ -1,7 +1,10 @@
+import 'package:better_auth_client/models/response/account.dart';
 import 'package:better_auth_client/models/response/base_response.dart';
 import 'package:better_auth_client/models/response/change_password_response.dart';
 import 'package:better_auth_client/models/response/session.dart';
 import 'package:better_auth_client/models/response/session_response.dart';
+import 'package:better_auth_client/models/response/social_sign_in_response.dart';
+import 'package:better_auth_client/models/response/token_refresh.dart';
 import 'package:better_auth_client/models/response/user.dart';
 import 'package:better_auth_client/models/response/verify_email.dart';
 import 'package:better_auth_client/models/signin.dart';
@@ -337,6 +340,101 @@ class BetterAuthClient<T extends User> {
     try {
       final response = await dio.post("/revoke-other-sessions", options: await _getOptions());
       return BetterAuthClientResponse(data: BaseResponse.fromJson(response.data, (json) => null), error: null);
+    } catch (e) {
+      return BetterAuthClientResponse(data: null, error: e as Exception);
+    }
+  }
+
+  /// Link a social account to the user
+  ///
+  /// [provider] is the provider of the social account
+  ///
+  /// [callbackURL] is the URL to redirect to after the social account is linked
+  ///
+  /// [scopes] is the scopes to request from the social account
+  Future<BetterAuthClientResponse<SocialSignInResponse, Exception>> linkSocialAccount({
+    required String provider,
+    String? callbackURL,
+    List<String>? scopes,
+  }) async {
+    try {
+      final response = await dio.post(
+        "/link-social",
+        data: {"provider": provider, "callbackURL": callbackURL, "scopes": scopes},
+        options: await _getOptions(),
+      );
+      return BetterAuthClientResponse(data: SocialSignInResponse.fromJson(response.data), error: null);
+    } catch (e) {
+      return BetterAuthClientResponse(data: null, error: e as Exception);
+    }
+  }
+
+  /// List all accounts of the user
+  Future<BetterAuthClientResponse<List<Account>, Exception>> listAccounts() async {
+    try {
+      final response = await dio.get("/list-accounts", options: await _getOptions());
+      return BetterAuthClientResponse(data: response.data.map((e) => Account.fromJson(e)).toList(), error: null);
+    } catch (e) {
+      return BetterAuthClientResponse(data: null, error: e as Exception);
+    }
+  }
+
+  /// Delete user
+  ///
+  /// [token] is the token of the account to delete
+  ///
+  /// [callbackURL] is the URL to redirect to after the account is deleted
+  Future<BetterAuthClientResponse<BaseResponseWithoutMessage, Exception>> deleteAccount({
+    required String token,
+    String? callbackURL,
+  }) async {
+    try {
+      final response = await dio.post("/delete-user/callback?token=$token&callbackURL=$callbackURL");
+      return BetterAuthClientResponse(data: BaseResponse.fromJson(response.data, (json) => null), error: null);
+    } catch (e) {
+      return BetterAuthClientResponse(data: null, error: e as Exception);
+    }
+  }
+
+  /// Unlink an account
+  ///
+  /// [providerId] is the id of the account to unlink
+  ///
+  /// [accountId] is the id of the account to unlink
+  Future<BetterAuthClientResponse<BaseResponseWithoutMessage, Exception>> unlinkAccount({
+    required String providerId,
+    String? accountId,
+  }) async {
+    try {
+      final response = await dio.post(
+        "/unlink-account",
+        data: {"providerId": providerId, "accountId": accountId},
+        options: await _getOptions(),
+      );
+      return BetterAuthClientResponse(data: BaseResponse.fromJson(response.data, (json) => null), error: null);
+    } catch (e) {
+      return BetterAuthClientResponse(data: null, error: e as Exception);
+    }
+  }
+
+  /// Refresh the access token using a refresh token
+  ///
+  /// [providerId] The provider ID for the OAuth provider
+  ///
+  /// [accountId] The account ID associated with the refresh token
+  ///
+  /// [userId] The user ID associated with the account
+  Future<BetterAuthClientResponse<TokenRefresh, Exception>> refreshToken({
+    required String providerId,
+    String? accountId,
+    String? userId,
+  }) async {
+    try {
+      final response = await dio.post(
+        "/refresh-token",
+        data: {"providerId": providerId, "accountId": accountId, "userId": userId},
+      );
+      return BetterAuthClientResponse(data: TokenRefresh.fromJson(response.data), error: null);
     } catch (e) {
       return BetterAuthClientResponse(data: null, error: e as Exception);
     }

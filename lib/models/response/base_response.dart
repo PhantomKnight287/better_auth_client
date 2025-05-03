@@ -13,11 +13,8 @@ class BaseResponse<T> {
 
   BaseResponse({required this.status, this.message});
 
-  factory BaseResponse.fromJson(
-    Map<String, dynamic> json,
-    T Function(Object? json) fromJsonT,
-  ) => _$BaseResponseFromJson(json, fromJsonT);
+  factory BaseResponse.fromJson(Map<String, dynamic> json, T Function(Object? json) fromJsonT) =>
+      _$BaseResponseFromJson(json, fromJsonT);
 
-  Map<String, dynamic> toJson(Object? Function(T value) toJsonT) =>
-      _$BaseResponseToJson(this, toJsonT);
+  Map<String, dynamic> toJson(Object? Function(T value) toJsonT) => _$BaseResponseToJson(this, toJsonT);
 }

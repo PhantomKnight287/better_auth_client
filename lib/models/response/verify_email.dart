@@ -10,7 +10,6 @@ class VerifyEmailResponse {
 
   VerifyEmailResponse({required this.user, required this.status});
 
-  factory VerifyEmailResponse.fromJson(Map<String, dynamic> json) =>
-      _$VerifyEmailResponseFromJson(json);
+  factory VerifyEmailResponse.fromJson(Map<String, dynamic> json) => _$VerifyEmailResponseFromJson(json);
   Map<String, dynamic> toJson() => _$VerifyEmailResponseToJson(this);
 }

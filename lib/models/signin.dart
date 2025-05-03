@@ -5,32 +5,6 @@ import 'package:better_auth_client/models/response/user.dart';
 import 'package:better_auth_client/networking/response.dart';
 import 'package:dio/dio.dart';
 
-enum Provider {
-  apple,
-  google,
-  github,
-  discord,
-  facebook,
-  kick,
-  tiktok,
-  twitch,
-  twitter,
-  dropdox,
-  linkedin,
-  gitlab,
-  reddit,
-  roblox,
-  spotify,
-  vk,
-  zoom,
-}
-
-extension ProviderId on Provider {
-  String get id {
-    return toString().split(".").elementAt(1);
-  }
-}
-
 class Signin<T extends User> {
   final Dio _dio;
   final Function(String) _setToken;
@@ -87,7 +61,7 @@ class Signin<T extends User> {
   ///
   /// [scopes] The scopes to use for the social provider. Will override the default scopes for the provider.
   Future<BetterAuthClientResponse<SocialSignInResponse, Exception>> social({
-    required Provider provider,
+    required String provider,
     String? callbackURL,
     String? newUserCallbackURL,
     String? errorCallbackURL,
@@ -98,7 +72,7 @@ class Signin<T extends User> {
       if (_scheme == null) {
         throw Exception("Scheme is not set. Please set the scheme in the BetterAuthClient constructor.");
       }
-      final body = {"provider": provider.id};
+      final body = {"provider": provider};
       if (callbackURL != null) {
         body["callbackURL"] = "$_scheme$callbackURL";
       }

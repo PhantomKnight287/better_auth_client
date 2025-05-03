@@ -9,8 +9,7 @@ class SocialSignInResponse {
 
   const SocialSignInResponse({required this.url, required this.redirect});
 
-  factory SocialSignInResponse.fromJson(Map<String, dynamic> json) =>
-      _$SocialSignInResponseFromJson(json);
+  factory SocialSignInResponse.fromJson(Map<String, dynamic> json) => _$SocialSignInResponseFromJson(json);
 
   toJson() => _$SocialSignInResponseToJson(this);
 }

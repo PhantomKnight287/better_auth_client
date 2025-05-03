@@ -24,8 +24,7 @@ class Session {
     required this.userId,
   });
 
-  factory Session.fromJson(Map<String, dynamic> json) =>
-      _$SessionFromJson(json);
+  factory Session.fromJson(Map<String, dynamic> json) => _$SessionFromJson(json);
 
   Map<String, dynamic> toJson() => _$SessionToJson(this);
 }
