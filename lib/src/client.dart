@@ -83,7 +83,7 @@ class BetterAuthClient<T extends User> {
 
   Future<Options> _getOptions() async {
     final token = await tokenStore.getToken();
-    assert(token != null && token.isNotEmpty, "Token is not set");
+    assert(token.isNotEmpty, "Token is not set");
     return Options(headers: {"Authorization": "Bearer $token"});
   }
 
