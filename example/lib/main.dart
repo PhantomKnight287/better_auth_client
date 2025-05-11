@@ -1,8 +1,7 @@
 import 'dart:async';
 
 import 'package:app_links/app_links.dart';
-import 'package:better_auth_client/models/client.dart';
-import 'package:better_auth_client/models/signin.dart';
+import 'package:better_auth_client/better_auth_client.dart';
 import 'package:better_auth_client/models/token_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
@@ -28,11 +27,7 @@ final appLinks = AppLinks();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  betterAuthClient = BetterAuthClient(
-    tokenStore: SharedPreferencesTokenStore(),
-    baseUrl: "http://localhost:3000/api/auth",
-    scheme: "bac://",
-  );
+  betterAuthClient = BetterAuthClient(tokenStore: SharedPreferencesTokenStore(), baseUrl: "http://localhost:3000/api/auth", scheme: "bac://");
   runApp(const MainApp());
 }
 
@@ -114,20 +109,15 @@ class _MainAppState extends State<MainApp> with WidgetsBindingObserver {
         body: Center(
           child: ElevatedButton(
             onPressed: () async {
-              final res = await betterAuthClient.signIn.social(
-                provider: Provider.github,
-                callbackURL: "/details",
-                errorCallbackURL: "/error",
-              );
-              if (res.data == null) return;
-              final url = Uri.parse(res.data!.url);
-              final result = await FlutterWebAuth2.authenticate(
-                url: url.toString(),
-                callbackUrlScheme: "bac",
-                options: FlutterWebAuth2Options(),
-              );
-              final resultUrl = Uri.parse(result);
-              await launchUrl(resultUrl, mode: LaunchMode.externalApplication);
+              try {
+                final res = await betterAuthClient.signIn.social(provider: "github", callbackURL: "/details", errorCallbackURL: "/error");
+                final url = Uri.parse(res.url);
+                final result = await FlutterWebAuth2.authenticate(url: url.toString(), callbackUrlScheme: "bac", options: FlutterWebAuth2Options());
+                final resultUrl = Uri.parse(result);
+                await launchUrl(resultUrl, mode: LaunchMode.externalApplication);
+              } catch (e) {
+                print(e);
+              }
             },
             child: Text("Sign in with github"),
           ),

@@ -1,43 +1,44 @@
-import 'package:better_auth_client/helpers/dio.dart';
+import 'package:better_auth_client/better_auth_client.dart';
 import 'package:better_auth_client/models/request/id_token.dart';
-import 'package:better_auth_client/models/response/social_sign_in_response.dart';
-import 'package:better_auth_client/models/response/user.dart';
 import 'package:dio/dio.dart';
 
 class Signin<T extends User> {
   final Dio _dio;
   final Function(String) _setToken;
   final String? _scheme;
-  final T Function(Map<String, dynamic>)? _fromJsonUser;
+  late final T Function(Map<String, dynamic> json) _fromJsonUser;
+  late final Future<Options> Function() _getOptions;
 
   Signin({
     required Dio dio,
     required Function(String) setToken,
     String? scheme,
-    T Function(Map<String, dynamic>)? fromJsonUser,
+    required T Function(Map<String, dynamic> json) fromJsonUser,
+    required Future<Options> Function() getOptions,
   }) : _dio = dio,
        _setToken = setToken,
        _scheme = scheme,
-       _fromJsonUser = fromJsonUser;
+       _fromJsonUser = fromJsonUser,
+       _getOptions = getOptions;
 
   /// Sign in with email and password
   ///
   /// [email] The email of the user
   ///
   /// [password] The password of the user
-  Future<User> email({required String email, required String password}) async {
-    try {
-      final response = await _dio.post("/sign-in/email", data: {"email": email, "password": password});
-      final body = response.data;
-      _setToken(body["token"]);
+  Future<User> email({String? email, required String password, String? username}) async {
+    assert(email != null || username != null, "Either email or username must be provided");
+    final response = await _dio.post(
+      "/sign-in/email",
+      data: {"email": email, "password": password, "username": username},
+    );
+    final body = response.data;
+    _setToken(body["token"]);
 
-      // Use custom fromJson if provided, otherwise use default User.fromJson
-      final user = User.fromJson(body["user"]);
-      _setToken(body["token"]);
-      return user;
-    } catch (e) {
-      rethrow;
-    }
+    // Use custom fromJson if provided, otherwise use default User.fromJson
+    final user = User.fromJson(body["user"]);
+    _setToken(body["token"]);
+    return user;
   }
 
   /// Sign in with a social provider
@@ -61,18 +62,20 @@ class Signin<T extends User> {
     IdToken? idToken,
     List<String>? scopes,
   }) async {
-    try {
-      if (_scheme == null) {
-        throw Exception("Scheme is not set. Please set the scheme in the BetterAuthClient constructor.");
-      }
-      final body = {"provider": provider};
-      if (callbackURL != null) {
-        body["callbackURL"] = "$_scheme$callbackURL";
-      }
-      final res = await _dio.post('/sign-in/social', data: body, options: Options(headers: {"expo-origin": _scheme}));
-      return SocialSignInResponse.fromJson(res.data);
-    } catch (e) {
-      rethrow;
+    if (_scheme == null) {
+      throw Exception("Scheme is not set. Please set the scheme in the BetterAuthClient constructor.");
     }
+    final body = {"provider": provider};
+    if (callbackURL != null) {
+      body["callbackURL"] = "$_scheme$callbackURL";
+    }
+    final res = await _dio.post('/sign-in/social', data: body, options: Options(headers: {"expo-origin": _scheme}));
+    return SocialSignInResponse.fromJson(res.data);
+  }
+
+  /// Sign in anonymously
+  Future<SessionResponse<T>> anonymous() async {
+    final response = await _dio.post("/sign-in/anonymous", options: await _getOptions());
+    return SessionResponse.fromJson(response.data, _fromJsonUser);
   }
 }
