@@ -1,3 +1,4 @@
+import 'package:better_auth_client/helpers/dio.dart';
 import 'package:better_auth_client/models/response/user.dart';
 import 'package:dio/dio.dart';
 
@@ -25,19 +26,24 @@ class Signup<T extends User> {
     String? image,
     String? username,
   }) async {
-    final response = await _dio.post(
-      "/sign-up/email",
-      data: {"email": email, "password": password, "name": name, "image": image, "username": username},
-    );
-    final body = response.data;
-    _setToken(body["token"]);
+    try {
+      final response = await _dio.post(
+        "/sign-up/email",
+        data: {"email": email, "password": password, "name": name, "image": image, "username": username},
+      );
+      final body = response.data;
+      _setToken(body["token"]);
 
-    // Use custom fromJson if provided, otherwise use default User.fromJson
-    final user =
-        _fromJsonUser != null
-            ? _fromJsonUser(body["user"])
-            : throw Exception("Custom fromJsonUser function is required when using a custom User type");
+      // Use custom fromJson if provided, otherwise use default User.fromJson
+      final user =
+          _fromJsonUser != null
+              ? _fromJsonUser(body["user"])
+              : throw Exception("Custom fromJsonUser function is required when using a custom User type");
 
-    return user;
+      return user;
+    } catch (e) {
+      final message = getErrorMessage(e);
+      throw message;
+    }
   }
 }

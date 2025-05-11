@@ -1,6 +1,8 @@
 {
   "[dart]": {
-    "editor.inlayHints.enabled": "on"
+    "editor.inlayHints.enabled": "on",
+    "editor.defaultFormatter": "Dart-Code.dart-code"
   },
-  "cmake.ignoreCMakeListsMissing": true
+  "cmake.ignoreCMakeListsMissing": true,
+  "editor.formatOnSave": true
 }

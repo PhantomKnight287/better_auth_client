@@ -1,4 +1,5 @@
 import 'package:better_auth_client/better_auth_client.dart';
+import 'package:better_auth_client/helpers/dio.dart';
 import 'package:better_auth_client/models/request/id_token.dart';
 import 'package:dio/dio.dart';
 
@@ -7,14 +8,14 @@ class Signin<T extends User> {
   final Function(String) _setToken;
   final String? _scheme;
   late final T Function(Map<String, dynamic> json) _fromJsonUser;
-  late final Future<Options> Function() _getOptions;
+  late final Future<Options> Function({bool isTokenRequired}) _getOptions;
 
   Signin({
     required Dio dio,
     required Function(String) setToken,
     String? scheme,
     required T Function(Map<String, dynamic> json) fromJsonUser,
-    required Future<Options> Function() getOptions,
+    required Future<Options> Function({bool isTokenRequired}) getOptions,
   }) : _dio = dio,
        _setToken = setToken,
        _scheme = scheme,
@@ -28,17 +29,23 @@ class Signin<T extends User> {
   /// [password] The password of the user
   Future<User> email({String? email, required String password, String? username}) async {
     assert(email != null || username != null, "Either email or username must be provided");
-    final response = await _dio.post(
-      "/sign-in/email",
-      data: {"email": email, "password": password, "username": username},
-    );
-    final body = response.data;
-    _setToken(body["token"]);
+    try {
+      final response = await _dio.post(
+        "/sign-in/email",
+        data: {"email": email, "password": password, "username": username},
+        options: await _getOptions(isTokenRequired: false),
+      );
+      final body = response.data;
+      _setToken(body["token"]);
 
-    // Use custom fromJson if provided, otherwise use default User.fromJson
-    final user = User.fromJson(body["user"]);
-    _setToken(body["token"]);
-    return user;
+      // Use custom fromJson if provided, otherwise use default User.fromJson
+      final user = User.fromJson(body["user"]);
+      _setToken(body["token"]);
+      return user;
+    } catch (e) {
+      final message = getErrorMessage(e);
+      throw message;
+    }
   }
 
   /// Sign in with a social provider
@@ -69,13 +76,72 @@ class Signin<T extends User> {
     if (callbackURL != null) {
       body["callbackURL"] = "$_scheme$callbackURL";
     }
-    final res = await _dio.post('/sign-in/social', data: body, options: Options(headers: {"expo-origin": _scheme}));
-    return SocialSignInResponse.fromJson(res.data);
+    final baseOptions = await _getOptions(isTokenRequired: false);
+    baseOptions.headers ??= {};
+    baseOptions.headers!["expo-origin"] = _scheme;
+    try {
+      final res = await _dio.post('/sign-in/social', data: body, options: baseOptions);
+      return SocialSignInResponse.fromJson(res.data);
+    } catch (e) {
+      final message = getErrorMessage(e);
+      throw message;
+    }
   }
 
   /// Sign in anonymously
   Future<SessionResponse<T>> anonymous() async {
-    final response = await _dio.post("/sign-in/anonymous", options: await _getOptions());
-    return SessionResponse.fromJson(response.data, _fromJsonUser);
+    try {
+      final response = await _dio.post("/sign-in/anonymous", options: await _getOptions(isTokenRequired: false));
+      return SessionResponse.fromJson(response.data, _fromJsonUser);
+    } catch (e) {
+      final message = getErrorMessage(e);
+      throw message;
+    }
+  }
+
+  /// Sign in with phone number
+  ///
+  /// [phoneNumber] The phone number of the user
+  ///
+  /// [password] The password of the user
+  ///
+  /// [rememberMe] Whether to remember the user
+  Future<SessionResponse<T>> phoneNumber({
+    required String phoneNumber,
+    required String password,
+    bool rememberMe = false,
+  }) async {
+    try {
+      final response = await _dio.post(
+        "/sign-in/phone-number",
+        data: {"phoneNumber": phoneNumber, "password": password, "rememberMe": rememberMe},
+        options: await _getOptions(isTokenRequired: false),
+      );
+      return SessionResponse.fromJson(response.data, _fromJsonUser);
+    } catch (e) {
+      final message = getErrorMessage(e);
+      throw message;
+    }
+  }
+
+  /// Sign in with a magic link
+  ///
+  /// [email] The email of the user
+  ///
+  /// [callbackURL] The callback URL to use. System will automatically prepend the scheme to the URL. So if you want send user to <your-app>://<callback-url>, you should pass <callback-url>
+  ///
+  /// [name] The name of the user
+  Future<SessionResponse<T>> magicLink({required String email, String? callbackURL, String? name}) async {
+    try {
+      final response = await _dio.post(
+        "/sign-in/magic-link",
+        data: {"email": email, "callbackURL": callbackURL, "name": name},
+        options: await _getOptions(isTokenRequired: false),
+      );
+      return SessionResponse.fromJson(response.data, _fromJsonUser);
+    } catch (e) {
+      final message = getErrorMessage(e);
+      throw message;
+    }
   }
 }

@@ -5,12 +5,13 @@
 Note: This repo will get most if not all of the updates on weekends or public holidays in India. I am unable to dedicate time to this out of my daily full time working schedule.
 </div>
 
-
-
 ## Plugins Supported
+
 - [x] Two Factor Authentication
 - [x] Anonymous Authentication
 - [x] Username
+- [x] Magic Link
+- [x] Phone Number
 
 ## Installation
 

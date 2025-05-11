@@ -1,4 +1,5 @@
 import 'package:better_auth_client/better_auth_client.dart';
+import 'package:better_auth_client/helpers/dio.dart';
 import 'package:better_auth_client/models/response/status_response.dart';
 import 'package:better_auth_client/models/response/two_factor/enable_two_factor.dart';
 import 'package:better_auth_client/models/response/two_factor/generate_backup_codes.dart';
@@ -19,12 +20,17 @@ class TwoFactorPlugin<T extends User> extends BasePlugin<T> {
   ///
   /// [password] The password of the user
   Future<TwoFactorTOTPURI> getTotpUri({required String password}) async {
-    final response = await dio.post(
-      "/two-factor/get-totp-uri",
-      data: {"password": password},
-      options: await super.getOptions(),
-    );
-    return TwoFactorTOTPURI.fromJson(response.data);
+    try {
+      final response = await dio.post(
+        "/two-factor/get-totp-uri",
+        data: {"password": password},
+        options: await super.getOptions(),
+      );
+      return TwoFactorTOTPURI.fromJson(response.data);
+    } catch (e) {
+      final message = getErrorMessage(e);
+      throw message;
+    }
   }
 
   /// Verify TOTP
@@ -32,18 +38,28 @@ class TwoFactorPlugin<T extends User> extends BasePlugin<T> {
   /// [code] The TOTP code
   /// [trustDevice] If true, the device will be trusted for 30 days. It'll be refreshed on every sign in request within this time.
   Future<StatusResponse> verifyTotp({required String code, bool trustDevice = false}) async {
-    final response = await dio.post(
-      "/two-factor/verify-totp",
-      data: {"code": code, "trustDevice": trustDevice},
-      options: await super.getOptions(),
-    );
-    return TwoFactorVerifyTotp.fromJson(response.data);
+    try {
+      final response = await dio.post(
+        "/two-factor/verify-totp",
+        data: {"code": code, "trustDevice": trustDevice},
+        options: await super.getOptions(),
+      );
+      return TwoFactorVerifyTotp.fromJson(response.data);
+    } catch (e) {
+      final message = getErrorMessage(e);
+      throw message;
+    }
   }
 
   /// Send two factor OTP to the user
   Future<StatusResponse> sendOtp() async {
-    final response = await dio.post("/two-factor/send-otp", options: await super.getOptions());
-    return StatusResponse.fromJson(response.data);
+    try {
+      final response = await dio.post("/two-factor/send-otp", options: await super.getOptions());
+      return StatusResponse.fromJson(response.data);
+    } catch (e) {
+      final message = getErrorMessage(e);
+      throw message;
+    }
   }
 
   /// Verify two factor OTP
@@ -51,14 +67,19 @@ class TwoFactorPlugin<T extends User> extends BasePlugin<T> {
   /// [code] The OTP code
   /// [trustDevice] If true, the device will be trusted for 30 days. It'll be refreshed on every sign in request within this time.
   Future<UserAndTokenResponse> verifyOtp({required String code, bool trustDevice = false}) async {
-    final response = await dio.post(
-      "/two-factor/verify-otp",
-      data: {"code": code, "trustDevice": trustDevice},
-      options: await super.getOptions(),
-    );
-    final responseData = UserAndTokenResponse.fromJson(response.data);
-    await super.setToken(responseData.token);
-    return responseData;
+    try {
+      final response = await dio.post(
+        "/two-factor/verify-otp",
+        data: {"code": code, "trustDevice": trustDevice},
+        options: await super.getOptions(),
+      );
+      final responseData = UserAndTokenResponse.fromJson(response.data);
+      await super.setToken(responseData.token);
+      return responseData;
+    } catch (e) {
+      final message = getErrorMessage(e);
+      throw message;
+    }
   }
 
   /// Verify backup code
@@ -71,18 +92,28 @@ class TwoFactorPlugin<T extends User> extends BasePlugin<T> {
     bool trustDevice = false,
     bool disableSession = false,
   }) async {
-    final response = await dio.post(
-      "/two-factor/verify-backup-code",
-      data: {"code": code, "trustDevice": trustDevice, "disableSession": disableSession},
-      options: await super.getOptions(),
-    );
-    return SessionResponse.fromJson(response.data, User.fromJson);
+    try {
+      final response = await dio.post(
+        "/two-factor/verify-backup-code",
+        data: {"code": code, "trustDevice": trustDevice, "disableSession": disableSession},
+        options: await super.getOptions(),
+      );
+      return SessionResponse.fromJson(response.data, User.fromJson);
+    } catch (e) {
+      final message = getErrorMessage(e);
+      throw message;
+    }
   }
 
   /// Generate backup codes
   Future<GenerateBackupCodes> generateBackupCodes() async {
-    final response = await dio.post("/two-factor/generate-backup-codes", options: await super.getOptions());
-    return GenerateBackupCodes.fromJson(response.data);
+    try {
+      final response = await dio.post("/two-factor/generate-backup-codes", options: await super.getOptions());
+      return GenerateBackupCodes.fromJson(response.data);
+    } catch (e) {
+      final message = getErrorMessage(e);
+      throw message;
+    }
   }
 
   /// Enable two factor
@@ -91,12 +122,17 @@ class TwoFactorPlugin<T extends User> extends BasePlugin<T> {
   /// [password] The password of the user
   /// [issuer] Custom issuer for the TOTP URI
   Future<EnableTwoFactorResponse> enableTwoFactor({required String password, String? issuer}) async {
-    final response = await dio.post(
-      "/two-factor/enable",
-      data: {"password": password, "issuer": issuer},
-      options: await super.getOptions(),
-    );
-    return EnableTwoFactorResponse.fromJson(response.data);
+    try {
+      final response = await dio.post(
+        "/two-factor/enable",
+        data: {"password": password, "issuer": issuer},
+        options: await super.getOptions(),
+      );
+      return EnableTwoFactorResponse.fromJson(response.data);
+    } catch (e) {
+      final message = getErrorMessage(e);
+      throw message;
+    }
   }
 
   /// Disable two factor
@@ -104,11 +140,16 @@ class TwoFactorPlugin<T extends User> extends BasePlugin<T> {
   ///
   /// [password] The password of the user
   Future<StatusResponse> disableTwoFactor({required String password}) async {
-    final response = await dio.post(
-      "/two-factor/disable",
-      data: {"password": password},
-      options: await super.getOptions(),
-    );
-    return StatusResponse.fromJson(response.data);
+    try {
+      final response = await dio.post(
+        "/two-factor/disable",
+        data: {"password": password},
+        options: await super.getOptions(),
+      );
+      return StatusResponse.fromJson(response.data);
+    } catch (e) {
+      final message = getErrorMessage(e);
+      throw message;
+    }
   }
 }

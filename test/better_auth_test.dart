@@ -1,7 +1,6 @@
 import 'package:better_auth_client/src/client.dart';
 import 'package:better_auth_client/models/response/extendable_user.dart';
 import 'package:better_auth_client/models/token_store.dart';
-import 'dart:io';
 
 class PremiumUser extends ExtendableUser {
   final bool premium;
@@ -41,8 +40,7 @@ class InMemoryTokenStore extends TokenStore {
 
   @override
   Future<String> getToken() {
-    print("Getting token: $_token");
-    return Future.value(_token);
+    return Future.value(_token ?? "");
   }
 
   @override
@@ -59,13 +57,19 @@ void main() async {
     fromJsonUser: PremiumUser.fromJson,
   );
 
-  final response = await client.signIn.email(email: 'test@mail.com', password: 'password');
-  print(response);
   try {
-    final session = await client.getSession();
-    print(session);
+    final response = await client.signIn.email(email: 'test@mail.com', password: 'password');
+    print(response);
   } catch (e, stack) {
     print(e);
     print(stack);
   }
+  try {
+    // final session = await client.getSession();
+    // print(session);
+  } catch (e, stack) {
+    print(e);
+    print(stack);
+  }
+  await client.phoneNumber.sendOTP(phoneNumber: "+1234567890");
 }

@@ -1,3 +1,8 @@
+### 0.0.4
+
+- Added support for magic link
+- Added support for phone number
+
 ## 0.0.3
 
 - Added support for username

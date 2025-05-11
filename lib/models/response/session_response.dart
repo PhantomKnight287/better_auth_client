@@ -2,8 +2,6 @@ import 'package:better_auth_client/models/response/session.dart';
 import 'package:better_auth_client/models/response/user.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'session_response.g.dart';
-
 @JsonSerializable(genericArgumentFactories: true)
 class SessionResponse<T extends User> {
   final Session session;
