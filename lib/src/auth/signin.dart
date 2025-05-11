@@ -2,7 +2,6 @@ import 'package:better_auth_client/helpers/dio.dart';
 import 'package:better_auth_client/models/request/id_token.dart';
 import 'package:better_auth_client/models/response/social_sign_in_response.dart';
 import 'package:better_auth_client/models/response/user.dart';
-import 'package:better_auth_client/networking/response.dart';
 import 'package:dio/dio.dart';
 
 class Signin<T extends User> {
@@ -26,24 +25,18 @@ class Signin<T extends User> {
   /// [email] The email of the user
   ///
   /// [password] The password of the user
-  Future<BetterAuthClientResponse<T, Exception>> email({required String email, required String password}) async {
+  Future<User> email({required String email, required String password}) async {
     try {
       final response = await _dio.post("/sign-in/email", data: {"email": email, "password": password});
       final body = response.data;
       _setToken(body["token"]);
 
       // Use custom fromJson if provided, otherwise use default User.fromJson
-      final user =
-          _fromJsonUser != null
-              ? _fromJsonUser!(body["user"])
-              : throw Exception("Custom fromJsonUser function is required when using a custom User type");
-
-      return BetterAuthClientResponse(data: user, error: null);
+      final user = User.fromJson(body["user"]);
+      _setToken(body["token"]);
+      return user;
     } catch (e) {
-      if (e is DioException) {
-        return BetterAuthClientResponse(data: null, error: Exception(dioErrorToMessage(e)));
-      }
-      return BetterAuthClientResponse(data: null, error: e as Exception);
+      rethrow;
     }
   }
 
@@ -60,7 +53,7 @@ class Signin<T extends User> {
   /// [idToken] The ID token to use for the social provider. Usually applicable to Apple and Google if you prefer to use native packages to handle the sign in process.
   ///
   /// [scopes] The scopes to use for the social provider. Will override the default scopes for the provider.
-  Future<BetterAuthClientResponse<SocialSignInResponse, Exception>> social({
+  Future<SocialSignInResponse> social({
     required String provider,
     String? callbackURL,
     String? newUserCallbackURL,
@@ -77,12 +70,9 @@ class Signin<T extends User> {
         body["callbackURL"] = "$_scheme$callbackURL";
       }
       final res = await _dio.post('/sign-in/social', data: body, options: Options(headers: {"expo-origin": _scheme}));
-      return BetterAuthClientResponse(data: SocialSignInResponse.fromJson(res.data), error: null);
+      return SocialSignInResponse.fromJson(res.data);
     } catch (e) {
-      if (e is DioException) {
-        return BetterAuthClientResponse(data: null, error: Exception(dioErrorToMessage(e)));
-      }
-      return BetterAuthClientResponse(data: null, error: e as Exception);
+      rethrow;
     }
   }
 }

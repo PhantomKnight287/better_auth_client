@@ -1,4 +1,4 @@
-import 'package:better_auth_client/models/client.dart';
+import 'package:better_auth_client/src/client.dart';
 import 'package:better_auth_client/models/response/extendable_user.dart';
 import 'package:better_auth_client/models/token_store.dart';
 import 'dart:io';
@@ -13,7 +13,7 @@ class PremiumUser extends ExtendableUser {
     super.image,
     required super.createdAt,
     required super.updatedAt,
-    super.isEmailVerified,
+    super.emailVerified,
     required this.premium,
   });
 
@@ -22,9 +22,9 @@ class PremiumUser extends ExtendableUser {
     email: json['email'],
     name: json['name'],
     image: json['image'],
-    createdAt: json['createdAt'],
-    updatedAt: json['updatedAt'],
-    isEmailVerified: json['isEmailVerified'],
+    createdAt: DateTime.parse(json['createdAt']),
+    updatedAt: DateTime.parse(json['updatedAt']),
+    emailVerified: json['emailVerified'],
     premium: json['premium'],
   );
 
@@ -42,25 +42,13 @@ class InMemoryTokenStore extends TokenStore {
   @override
   Future<String> getToken() {
     print("Getting token: $_token");
-    return Future.value(_token ?? "");
+    return Future.value(_token);
   }
 
   @override
   Future<void> saveToken(String? token) {
     _token = token;
     return Future.value();
-  }
-}
-
-Future<void> openUrl(String url) async {
-  if (Platform.isWindows) {
-    await Process.run('start', [url], runInShell: true);
-  } else if (Platform.isMacOS) {
-    await Process.run('open', [url], runInShell: true);
-  } else if (Platform.isLinux) {
-    await Process.run('xdg-open', [url], runInShell: true);
-  } else {
-    throw UnsupportedError('Unsupported platform: ${Platform.operatingSystem}');
   }
 }
 
@@ -72,12 +60,12 @@ void main() async {
   );
 
   final response = await client.signIn.email(email: 'test@mail.com', password: 'password');
-
-  if (response.error != null) {
-    throw response.error!;
-  } else {
-    print(response.data);
+  print(response);
+  try {
+    final session = await client.getSession();
+    print(session);
+  } catch (e, stack) {
+    print(e);
+    print(stack);
   }
-  final session = await client.getSession();
-  print(session.error);
 }

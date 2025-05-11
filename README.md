@@ -96,7 +96,7 @@ Use the `ExtendableUser` class for a cleaner inheritance approach:
 ```dart
 class CustomUser extends ExtendableUser {
   final String customField;
-  
+
   CustomUser({
     required super.id,
     required super.email,
@@ -104,10 +104,21 @@ class CustomUser extends ExtendableUser {
     super.image,
     required super.createdAt,
     required super.updatedAt,
-    super.isEmailVerified,
+    super.emailVerified,
     required this.customField,
+    super.twoFactorEnabled,
+    super.username,
+    super.displayUsername,
+    super.isAnonymous,
+    super.phoneNumber,
+    super.phoneNumberVerified,
+    super.role,
+    super.banned,
+    super.banReason,
+    super.banExpires,
+
   });
-  
+
   factory CustomUser.fromJson(Map<String, dynamic> json) {
     return CustomUser(
       id: json['id'],
@@ -116,11 +127,21 @@ class CustomUser extends ExtendableUser {
       image: json['image'],
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
-      isEmailVerified: json['isEmailVerified'],
+      emailVerified: json['emailVerified'],
+      twoFactorEnabled: json['twoFactorEnabled'],
+      username: json['username'],
+      displayUsername: json['displayUsername'],
+      isAnonymous: json['isAnonymous'],
+      phoneNumber: json['phoneNumber'],
+      phoneNumberVerified: json['phoneNumberVerified'],
+      role: json['role'],
+      banned: json['banned'],
+      banReason: json['banReason'],
+      banExpires: json['banExpires'],
       customField: json['customField'],
     );
   }
-  
+
   @override
   Map<String, dynamic> toJson() {
     final json = super.toJson();
@@ -136,4 +157,3 @@ final client = BetterAuthClient(
   fromJsonUser: CustomUser.fromJson,
 );
 ```
-

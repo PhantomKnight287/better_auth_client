@@ -17,4 +17,7 @@ SessionResponse<T> _$SessionResponseFromJson<T extends User>(
 Map<String, dynamic> _$SessionResponseToJson<T extends User>(
   SessionResponse<T> instance,
   Object? Function(T value) toJsonT,
-) => <String, dynamic>{'session': instance.session, 'user': toJsonT(instance.user)};
+) => <String, dynamic>{
+  'session': instance.session,
+  'user': toJsonT(instance.user),
+};

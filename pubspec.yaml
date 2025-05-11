@@ -1,6 +1,6 @@
 name: better_auth_client
 description: "A client package for Better Auth. Allow you use Better Auth in your Dart applications"
-version: 0.0.1
+version: 0.0.2
 repository: https://github.com/phantomknight287/better_auth_client
 
 
@@ -10,7 +10,6 @@ environment:
 dependencies:
   dio: ^5.8.0+1
   json_annotation: ^4.9.0
-  pretty_dio_logger: ^1.4.0
 
 dev_dependencies:
   flutter_lints: ^5.0.0

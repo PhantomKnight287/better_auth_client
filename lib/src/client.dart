@@ -7,11 +7,11 @@ import 'package:better_auth_client/models/response/social_sign_in_response.dart'
 import 'package:better_auth_client/models/response/token_refresh.dart';
 import 'package:better_auth_client/models/response/user.dart';
 import 'package:better_auth_client/models/response/verify_email.dart';
-import 'package:better_auth_client/models/signin.dart';
+import 'package:better_auth_client/plugins/two_factor.dart';
+import 'package:better_auth_client/src/auth/signin.dart';
 import 'package:better_auth_client/models/token_store.dart';
-import 'package:better_auth_client/models/signup.dart';
+import 'package:better_auth_client/src/auth/signup.dart';
 import 'package:better_auth_client/networking/main.dart';
-import 'package:better_auth_client/networking/response.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
 
@@ -43,7 +43,12 @@ class BetterAuthClient<T extends User> {
   String? scheme;
   late final Signup<T> signUp;
   late final Signin<T> signIn;
-  late final Dio dio;
+  late final Dio _dio;
+
+  /// Two-Factor Authentication (2FA) plugin.
+  ///
+  /// Requires [twoFactor] plugin to be installed server side
+  late final TwoFactorPlugin twoFactor;
 
   /// Function to convert JSON to a custom user model
   /// If not provided, the default User.fromJson will be used
@@ -59,59 +64,57 @@ class BetterAuthClient<T extends User> {
   }
 
   void _internal() {
-    dio = generateDioClient(baseUrl);
-    signUp = Signup<T>(dio: dio, setToken: tokenStore.saveToken, fromJsonUser: _fromJsonUser);
-    signIn = Signin<T>(dio: dio, setToken: tokenStore.saveToken, scheme: scheme, fromJsonUser: _fromJsonUser);
+    _dio = generateDioClient(baseUrl);
+    signUp = Signup<T>(dio: _dio, setToken: tokenStore.saveToken, fromJsonUser: _fromJsonUser);
+    signIn = Signin<T>(dio: _dio, setToken: tokenStore.saveToken, scheme: scheme, fromJsonUser: _fromJsonUser);
   }
 
   Future<Options> _getOptions() async {
-    return Options(headers: {"Authorization": "Bearer ${await tokenStore.getToken()}"});
+    final token = await tokenStore.getToken();
+    assert(token != null && token.isNotEmpty, "Token is not set");
+    return Options(headers: {"Authorization": "Bearer $token"});
   }
 
   /// Sign out the user. This calls [TokenStore.saveToken] with null.
-  Future<BetterAuthClientResponse<void, Exception>> signOut() async {
+  Future<void> signOut() async {
     try {
-      await dio.post('/sign-out', options: await _getOptions());
+      await _dio.post('/sign-out', options: await _getOptions());
       await tokenStore.saveToken(null);
-      return BetterAuthClientResponse(data: null, error: null);
     } catch (e) {
-      return BetterAuthClientResponse(data: null, error: e as Exception);
+      rethrow;
     }
   }
 
   /// Send a verification email to the user.
-  Future<BetterAuthClientResponse<void, Exception>> sendVerificationEmail(String email, {String? callbackURL}) async {
+  Future<void> sendVerificationEmail(String email, {String? callbackURL}) async {
     try {
-      await dio.post("/send-verification-email", data: {"email": email, "callbackURL": callbackURL});
-      return BetterAuthClientResponse(data: null, error: null);
+      await _dio.post("/send-verification-email", data: {"email": email, "callbackURL": callbackURL});
     } catch (e) {
-      return BetterAuthClientResponse(data: null, error: e as Exception);
+      rethrow;
     }
   }
 
   /// Send a forgot password email to the user.
-  Future<BetterAuthClientResponse<void, Exception>> forgetPassword(String email, {String? callbackURL}) async {
+  Future<void> forgetPassword(String email, {String? callbackURL}) async {
     try {
-      await dio.post("/forget-password", data: {"email": email, "callbackURL": callbackURL});
-      return BetterAuthClientResponse(data: null, error: null);
+      await _dio.post("/forget-password", data: {"email": email, "callbackURL": callbackURL});
     } catch (e) {
-      return BetterAuthClientResponse(data: null, error: e as Exception);
+      rethrow;
     }
   }
 
   /// Reset the password of the user.
   ///
   /// [token] is the token that was sent to the user's email.
-  Future<BetterAuthClientResponse<void, Exception>> resetPassword(String token, String newPassword) async {
+  Future<void> resetPassword(String token, String newPassword) async {
     try {
-      await dio.post(
+      await _dio.post(
         "/reset-password",
         data: {"token": token, "newPassword": newPassword},
         options: await _getOptions(),
       );
-      return BetterAuthClientResponse(data: null, error: null);
     } catch (e) {
-      return BetterAuthClientResponse(data: null, error: e as Exception);
+      rethrow;
     }
   }
 
@@ -170,18 +173,15 @@ class BetterAuthClient<T extends User> {
   /// Calls [TokenStore.getToken] to get the token and adds it to the request headers.
   ///
   /// Requires Bearer Plugin to be installed
-  Future<BetterAuthClientResponse<SessionResponse<T>, Exception>> getSession() async {
+  Future<SessionResponse<T>> getSession() async {
     try {
-      final response = await dio.get("/get-session", options: await _getOptions());
-      return BetterAuthClientResponse(
-        data: SessionResponse.fromJson(
-          response.data,
-          _fromJsonUser ?? User.fromJson as T Function(Map<String, dynamic>),
-        ),
-        error: null,
+      final response = await _dio.get("/get-session", options: await _getOptions());
+      return SessionResponse.fromJson(
+        response.data,
+        _fromJsonUser ?? User.fromJson as T Function(Map<String, dynamic>),
       );
     } catch (e) {
-      return BetterAuthClientResponse(data: null, error: e as Exception);
+      rethrow;
     }
   }
 
@@ -190,15 +190,12 @@ class BetterAuthClient<T extends User> {
   /// [token] is the token that was sent to the user's email.
   ///
   /// [callbackURL] is the URL to redirect to after the email is verified.
-  Future<BetterAuthClientResponse<VerifyEmailResponse, Exception>> verifyEmail({
-    required String token,
-    String? callbackURL,
-  }) async {
+  Future<VerifyEmailResponse> verifyEmail({required String token, String? callbackURL}) async {
     try {
-      final response = await dio.post("/verify-email", queryParameters: {"token": token, "callbackURL": callbackURL});
-      return BetterAuthClientResponse(data: VerifyEmailResponse.fromJson(response.data), error: null);
+      final response = await _dio.post("/verify-email", queryParameters: {"token": token, "callbackURL": callbackURL});
+      return VerifyEmailResponse.fromJson(response.data);
     } catch (e) {
-      return BetterAuthClientResponse(data: null, error: e as Exception);
+      rethrow;
     }
   }
 
@@ -207,25 +204,19 @@ class BetterAuthClient<T extends User> {
   /// [newEmail] is the new email of the user.
   ///
   /// [callbackURL] is the URL to redirect to after the email is changed.
-  Future<BetterAuthClientResponse<BaseResponseWithMessage, Exception>> changeEmail({
-    required String newEmail,
-    String? callbackURL,
-  }) async {
+  Future<BaseResponseWithMessage> changeEmail({required String newEmail, String? callbackURL}) async {
     try {
-      final response = await dio.post(
+      final response = await _dio.post(
         "/change-email",
         data: {"newEmail": newEmail, "callbackURL": callbackURL},
         options: await _getOptions(),
       );
-      return BetterAuthClientResponse(
-        data: BaseResponse.fromJson(
-          response.data,
-          (json) => (json as Map<String, dynamic>?)?["message"] as String? ?? "",
-        ),
-        error: null,
+      return BaseResponse.fromJson(
+        response.data,
+        (json) => (json as Map<String, dynamic>?)?["message"] as String? ?? "",
       );
     } catch (e) {
-      return BetterAuthClientResponse(data: null, error: e as Exception);
+      rethrow;
     }
   }
 
@@ -236,13 +227,13 @@ class BetterAuthClient<T extends User> {
   /// [currentPassword] is the current password of the user.
   ///
   /// [revokeOtherSessions] is the flag to remove other sessions of the user. Defaults to false.
-  Future<BetterAuthClientResponse<ChangePasswordResponse, Exception>> changePassword({
+  Future<ChangePasswordResponse> changePassword({
     required String newPassword,
     required String currentPassword,
     bool? revokeOtherSessions = false,
   }) async {
     try {
-      final response = await dio.post(
+      final response = await _dio.post(
         "/change-password",
         data: {
           "newPassword": newPassword,
@@ -251,9 +242,9 @@ class BetterAuthClient<T extends User> {
         },
         options: await _getOptions(),
       );
-      return BetterAuthClientResponse(data: ChangePasswordResponse.fromJson(response.data), error: null);
+      return ChangePasswordResponse.fromJson(response.data);
     } catch (e) {
-      return BetterAuthClientResponse(data: null, error: e as Exception);
+      rethrow;
     }
   }
 
@@ -262,19 +253,16 @@ class BetterAuthClient<T extends User> {
   /// [name] is the new name of the user.
   ///
   /// [image] is the new image of the user.
-  Future<BetterAuthClientResponse<BaseResponseWithoutMessage, Exception>> updateUser({
-    String? name,
-    String? image,
-  }) async {
+  Future<BaseResponseWithoutMessage> updateUser({String? name, String? image}) async {
     try {
-      final response = await dio.post(
+      final response = await _dio.post(
         "/update-user",
         data: {"name": name, "image": image},
         options: await _getOptions(),
       );
-      return BetterAuthClientResponse(data: BaseResponse.fromJson(response.data, (json) => null), error: null);
+      return BaseResponse.fromJson(response.data, (json) => null);
     } catch (e) {
-      return BetterAuthClientResponse(data: null, error: e as Exception);
+      rethrow;
     }
   }
 
@@ -285,63 +273,59 @@ class BetterAuthClient<T extends User> {
   /// [token] is the token sent using [sendDeleteAccountVerification]
   ///
   /// [callbackURL] is the URL to redirect to after the user is deleted.
-  Future<BetterAuthClientResponse<BaseResponseWithoutMessage, Exception>> deleteUser({
-    String? password,
-    String? token,
-    String? callbackURL,
-  }) async {
+  Future<BaseResponseWithoutMessage> deleteUser({String? password, String? token, String? callbackURL}) async {
     try {
       assert(password != null || token != null, "Either password or token must be provided");
-      final response = await dio.post(
+      final response = await _dio.post(
         "/delete-user",
         data: {"password": password, "token": token, "callbackURL": callbackURL},
         options: password != null ? await _getOptions() : null,
       );
-      return BetterAuthClientResponse(data: BaseResponse.fromJson(response.data, (json) => null), error: null);
+      return BaseResponse.fromJson(response.data, (json) => null);
     } catch (e) {
-      return BetterAuthClientResponse(data: null, error: e as Exception);
+      rethrow;
     }
   }
 
   /// List all sessions of the user.
-  Future<BetterAuthClientResponse<List<Session>, Exception>> listSessions() async {
+  Future<List<Session>> listSessions() async {
     try {
-      final response = await dio.get("/list-sessions", options: await _getOptions());
-      return BetterAuthClientResponse(data: response.data.map((e) => Session.fromJson(e)).toList(), error: null);
+      final response = await _dio.get("/list-sessions", options: await _getOptions());
+      return response.data.map((e) => Session.fromJson(e)).toList();
     } catch (e) {
-      return BetterAuthClientResponse(data: null, error: e as Exception);
+      rethrow;
     }
   }
 
   /// Revoke a session
   ///
   /// [token] is the token of the session to revoke
-  Future<BetterAuthClientResponse<BaseResponseWithoutMessage, Exception>> revokeSession({required String token}) async {
+  Future<BaseResponseWithoutMessage> revokeSession({required String token}) async {
     try {
-      final response = await dio.post("/revoke-session", data: {"token": token});
-      return BetterAuthClientResponse(data: BaseResponse.fromJson(response.data, (json) => null), error: null);
+      final response = await _dio.post("/revoke-session", data: {"token": token});
+      return BaseResponse.fromJson(response.data, (json) => null);
     } catch (e) {
-      return BetterAuthClientResponse(data: null, error: e as Exception);
+      rethrow;
     }
   }
 
   /// Revoke all sessions of the user
-  Future<BetterAuthClientResponse<BaseResponseWithoutMessage, Exception>> revokeSessions() async {
+  Future<BaseResponseWithoutMessage> revokeSessions() async {
     try {
-      final response = await dio.post("/revoke-sessions", options: await _getOptions());
-      return BetterAuthClientResponse(data: BaseResponse.fromJson(response.data, (json) => null), error: null);
+      final response = await _dio.post("/revoke-sessions", options: await _getOptions());
+      return BaseResponse.fromJson(response.data, (json) => null);
     } catch (e) {
-      return BetterAuthClientResponse(data: null, error: e as Exception);
+      rethrow;
     }
   }
 
   /// Revoke all sessions of the user except the current one
-  Future<BetterAuthClientResponse<BaseResponseWithoutMessage, Exception>> revokeOtherSessions() async {
+  Future<BaseResponseWithoutMessage> revokeOtherSessions() async {
     try {
-      final response = await dio.post("/revoke-other-sessions", options: await _getOptions());
-      return BetterAuthClientResponse(data: BaseResponse.fromJson(response.data, (json) => null), error: null);
+      final response = await _dio.post("/revoke-other-sessions", options: await _getOptions());
+      return BaseResponse.fromJson(response.data, (json) => null);
     } catch (e) {
-      return BetterAuthClientResponse(data: null, error: e as Exception);
+      rethrow;
     }
   }
 
@@ -352,30 +336,30 @@ class BetterAuthClient<T extends User> {
   /// [callbackURL] is the URL to redirect to after the social account is linked
   ///
   /// [scopes] is the scopes to request from the social account
-  Future<BetterAuthClientResponse<SocialSignInResponse, Exception>> linkSocialAccount({
+  Future<SocialSignInResponse> linkSocialAccount({
     required String provider,
     String? callbackURL,
     List<String>? scopes,
   }) async {
     try {
-      final response = await dio.post(
+      final response = await _dio.post(
         "/link-social",
         data: {"provider": provider, "callbackURL": callbackURL, "scopes": scopes},
         options: await _getOptions(),
       );
-      return BetterAuthClientResponse(data: SocialSignInResponse.fromJson(response.data), error: null);
+      return SocialSignInResponse.fromJson(response.data);
     } catch (e) {
-      return BetterAuthClientResponse(data: null, error: e as Exception);
+      rethrow;
     }
   }
 
   /// List all accounts of the user
-  Future<BetterAuthClientResponse<List<Account>, Exception>> listAccounts() async {
+  Future<List<Account>> listAccounts() async {
     try {
-      final response = await dio.get("/list-accounts", options: await _getOptions());
-      return BetterAuthClientResponse(data: response.data.map((e) => Account.fromJson(e)).toList(), error: null);
+      final response = await _dio.get("/list-accounts", options: await _getOptions());
+      return response.data.map((e) => Account.fromJson(e)).toList();
     } catch (e) {
-      return BetterAuthClientResponse(data: null, error: e as Exception);
+      rethrow;
     }
   }
 
@@ -384,15 +368,12 @@ class BetterAuthClient<T extends User> {
   /// [token] is the token of the account to delete
   ///
   /// [callbackURL] is the URL to redirect to after the account is deleted
-  Future<BetterAuthClientResponse<BaseResponseWithoutMessage, Exception>> deleteAccount({
-    required String token,
-    String? callbackURL,
-  }) async {
+  Future<BaseResponseWithoutMessage> deleteAccount({required String token, String? callbackURL}) async {
     try {
-      final response = await dio.post("/delete-user/callback?token=$token&callbackURL=$callbackURL");
-      return BetterAuthClientResponse(data: BaseResponse.fromJson(response.data, (json) => null), error: null);
+      final response = await _dio.post("/delete-user/callback?token=$token&callbackURL=$callbackURL");
+      return BaseResponse.fromJson(response.data, (json) => null);
     } catch (e) {
-      return BetterAuthClientResponse(data: null, error: e as Exception);
+      rethrow;
     }
   }
 
@@ -401,19 +382,16 @@ class BetterAuthClient<T extends User> {
   /// [providerId] is the id of the account to unlink
   ///
   /// [accountId] is the id of the account to unlink
-  Future<BetterAuthClientResponse<BaseResponseWithoutMessage, Exception>> unlinkAccount({
-    required String providerId,
-    String? accountId,
-  }) async {
+  Future<BaseResponseWithoutMessage> unlinkAccount({required String providerId, String? accountId}) async {
     try {
-      final response = await dio.post(
+      final response = await _dio.post(
         "/unlink-account",
         data: {"providerId": providerId, "accountId": accountId},
         options: await _getOptions(),
       );
-      return BetterAuthClientResponse(data: BaseResponse.fromJson(response.data, (json) => null), error: null);
+      return BaseResponse.fromJson(response.data, (json) => null);
     } catch (e) {
-      return BetterAuthClientResponse(data: null, error: e as Exception);
+      rethrow;
     }
   }
 
@@ -424,19 +402,15 @@ class BetterAuthClient<T extends User> {
   /// [accountId] The account ID associated with the refresh token
   ///
   /// [userId] The user ID associated with the account
-  Future<BetterAuthClientResponse<TokenRefresh, Exception>> refreshToken({
-    required String providerId,
-    String? accountId,
-    String? userId,
-  }) async {
+  Future<TokenRefresh> refreshToken({required String providerId, String? accountId, String? userId}) async {
     try {
-      final response = await dio.post(
+      final response = await _dio.post(
         "/refresh-token",
         data: {"providerId": providerId, "accountId": accountId, "userId": userId},
       );
-      return BetterAuthClientResponse(data: TokenRefresh.fromJson(response.data), error: null);
+      return TokenRefresh.fromJson(response.data);
     } catch (e) {
-      return BetterAuthClientResponse(data: null, error: e as Exception);
+      rethrow;
     }
   }
 }

@@ -1,6 +1,4 @@
-import 'package:better_auth_client/helpers/dio.dart';
 import 'package:better_auth_client/models/response/user.dart';
-import 'package:better_auth_client/networking/response.dart';
 import 'package:dio/dio.dart';
 
 class Signup<T extends User> {
@@ -13,12 +11,7 @@ class Signup<T extends User> {
       _setToken = setToken,
       _fromJsonUser = fromJsonUser;
 
-  Future<BetterAuthClientResponse<T, Exception>> email({
-    required String name,
-    required String email,
-    required String password,
-    String? image,
-  }) async {
+  Future<T> email({required String name, required String email, required String password, String? image}) async {
     try {
       final response = await _dio.post(
         "/sign-up/email",
@@ -33,12 +26,9 @@ class Signup<T extends User> {
               ? _fromJsonUser!(body["user"])
               : throw Exception("Custom fromJsonUser function is required when using a custom User type");
 
-      return BetterAuthClientResponse(data: user, error: null);
+      return user;
     } catch (e) {
-      if (e is DioException) {
-        return BetterAuthClientResponse(data: null, error: Exception(dioErrorToMessage(e)));
-      }
-      return BetterAuthClientResponse(data: null, error: e as Exception);
+      rethrow;
     }
   }
 }

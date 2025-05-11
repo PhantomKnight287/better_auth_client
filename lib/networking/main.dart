@@ -1,6 +1,5 @@
 import 'package:better_auth_client/better_auth_client.dart';
 import 'package:dio/dio.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 class SetAuthTokenHeaderInterceptor extends Interceptor {
   final TokenStore store;
@@ -17,16 +16,5 @@ class SetAuthTokenHeaderInterceptor extends Interceptor {
 
 Dio generateDioClient(String baseUrl) {
   final dio = Dio(BaseOptions(baseUrl: baseUrl));
-  dio.interceptors.add(
-    PrettyDioLogger(
-      request: true,
-      requestBody: true,
-      requestHeader: true,
-      enabled: true,
-      error: true,
-      responseBody: true,
-      responseHeader: true,
-    ),
-  );
   return dio;
 }
