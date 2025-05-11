@@ -9,5 +9,6 @@ class TwoFactorVerifyTotp extends StatusResponse {
 
   factory TwoFactorVerifyTotp.fromJson(Map<String, dynamic> json) => _$TwoFactorVerifyTotpFromJson(json);
 
+  @override
   Map<String, dynamic> toJson() => _$TwoFactorVerifyTotpToJson(this);
 }

@@ -23,10 +23,7 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
   role: json['role'] as String?,
   banned: json['banned'] as bool?,
   banReason: json['banReason'] as String?,
-  banExpires:
-      json['banExpires'] == null
-          ? null
-          : DateTime.parse(json['banExpires'] as String),
+  banExpires: json['banExpires'] == null ? null : DateTime.parse(json['banExpires'] as String),
   customProperties: json['customProperties'] as Map<String, dynamic>?,
 );
 

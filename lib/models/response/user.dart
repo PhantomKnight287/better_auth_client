@@ -43,8 +43,8 @@ class User {
     this.banned,
     this.banReason,
     this.banExpires,
-    Map<String, dynamic>? customProperties,
-  }) : this.customProperties = customProperties ?? {};
+    this.customProperties,
+  });
 
   factory User.fromJson(Map<String, dynamic> json) {
     final jsonCopy = Map<String, dynamic>.from(json);

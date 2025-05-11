@@ -1,3 +1,6 @@
-## 0.0.1
+## 0.0.3
 
-* TODO: Describe initial release.
+- Added support for username
+- Added support for social login
+- Added support for two factor authentication
+- Added support for anonymous authentication

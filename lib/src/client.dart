@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_returning_null_for_void
+
 import 'package:better_auth_client/models/response/account.dart';
 import 'package:better_auth_client/models/response/base_response.dart';
 import 'package:better_auth_client/models/response/change_password_response.dart';

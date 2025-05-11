@@ -9,6 +9,6 @@ part of 'two_factor_verify_totp.dart';
 TwoFactorVerifyTotp _$TwoFactorVerifyTotpFromJson(Map<String, dynamic> json) =>
     TwoFactorVerifyTotp(status: json['status'] as bool);
 
-Map<String, dynamic> _$TwoFactorVerifyTotpToJson(
-  TwoFactorVerifyTotp instance,
-) => <String, dynamic>{'status': instance.status};
+Map<String, dynamic> _$TwoFactorVerifyTotpToJson(TwoFactorVerifyTotp instance) => <String, dynamic>{
+  'status': instance.status,
+};
