@@ -10,6 +10,7 @@ import 'package:better_auth_client/models/response/social_sign_in_response.dart'
 import 'package:better_auth_client/models/response/token_refresh.dart';
 import 'package:better_auth_client/models/response/user.dart';
 import 'package:better_auth_client/models/response/verify_email.dart';
+import 'package:better_auth_client/plugins/email_otp.dart';
 import 'package:better_auth_client/plugins/magic_link.dart';
 import 'package:better_auth_client/plugins/phone_number.dart';
 import 'package:better_auth_client/plugins/two_factor.dart';
@@ -47,7 +48,11 @@ class BetterAuthClient<T extends User> {
   /// The Deep Link scheme of your app
   /// This will be used to open the callback urls
   String? scheme;
+
+  /// The signup object
   late final Signup<T> signUp;
+
+  /// The signin object
   late final Signin<T> signIn;
   late final Dio _dio;
 
@@ -65,6 +70,11 @@ class BetterAuthClient<T extends User> {
   ///
   /// Requires [magicLink] plugin to be installed server side
   late final MagicLinkPlugin<T> magicLink;
+
+  /// The email OTP plugin
+  ///
+  /// Requires [emailOtp] plugin to be installed server side
+  late final EmailOtpPlugin emailOtp;
 
   /// Function to convert JSON to a custom user model
   /// If not provided, the default User.fromJson will be used
@@ -102,6 +112,12 @@ class BetterAuthClient<T extends User> {
       fromJsonUser: _fromJsonUser,
     );
     magicLink = MagicLinkPlugin<T>(
+      dio: _dio,
+      getOptions: _getOptions,
+      setToken: tokenStore.saveToken,
+      fromJsonUser: _fromJsonUser,
+    );
+    emailOtp = EmailOtpPlugin<T>(
       dio: _dio,
       getOptions: _getOptions,
       setToken: tokenStore.saveToken,

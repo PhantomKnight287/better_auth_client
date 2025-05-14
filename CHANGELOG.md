@@ -1,3 +1,7 @@
+### 0.0.5
+
+- Added support for email OTP
+
 ### 0.0.4
 
 - Added support for magic link

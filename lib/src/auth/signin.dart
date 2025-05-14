@@ -1,6 +1,8 @@
 import 'package:better_auth_client/better_auth_client.dart';
 import 'package:better_auth_client/helpers/dio.dart';
 import 'package:better_auth_client/models/request/id_token.dart';
+import 'package:better_auth_client/models/response/status_response.dart';
+import 'package:better_auth_client/models/response/user_and_token_response.dart';
 import 'package:dio/dio.dart';
 
 class Signin<T extends User> {
@@ -69,9 +71,7 @@ class Signin<T extends User> {
     IdToken? idToken,
     List<String>? scopes,
   }) async {
-    if (_scheme == null) {
-      throw Exception("Scheme is not set. Please set the scheme in the BetterAuthClient constructor.");
-    }
+    assert(_scheme != null, "Scheme is not set. Please set the scheme in the BetterAuthClient constructor.");
     final body = {"provider": provider};
     if (callbackURL != null) {
       body["callbackURL"] = "$_scheme$callbackURL";
@@ -131,14 +131,33 @@ class Signin<T extends User> {
   /// [callbackURL] The callback URL to use. System will automatically prepend the scheme to the URL. So if you want send user to <your-app>://<callback-url>, you should pass <callback-url>
   ///
   /// [name] The name of the user
-  Future<SessionResponse<T>> magicLink({required String email, String? callbackURL, String? name}) async {
+  Future<StatusResponse> magicLink({required String email, String? callbackURL, String? name}) async {
     try {
       final response = await _dio.post(
         "/sign-in/magic-link",
         data: {"email": email, "callbackURL": callbackURL, "name": name},
         options: await _getOptions(isTokenRequired: false),
       );
-      return SessionResponse.fromJson(response.data, _fromJsonUser);
+      return StatusResponse.fromJson(response.data);
+    } catch (e) {
+      final message = getErrorMessage(e);
+      throw message;
+    }
+  }
+
+  /// Sign in with email OTP
+  ///
+  /// [email] The email of the user
+  ///
+  /// [otp] The OTP of the user
+  Future<UserAndTokenResponse> emailOtp({required String email, required String otp}) async {
+    try {
+      final response = await _dio.post(
+        "/sign-in/email-otp",
+        data: {"email": email, "otp": otp},
+        options: await _getOptions(isTokenRequired: false),
+      );
+      return UserAndTokenResponse.fromJson(response.data);
     } catch (e) {
       final message = getErrorMessage(e);
       throw message;
