@@ -71,7 +71,7 @@ class Signin<T extends User> {
     IdToken? idToken,
     List<String>? scopes,
   }) async {
-    assert(_scheme != null, "Scheme is not set. Please set the scheme in the BetterAuthClient constructor.");
+    assert(idToken != null || _scheme != null, "Either idToken or scheme must be provided");
     final body = {"provider": provider};
     if (callbackURL != null) {
       body["callbackURL"] = "$_scheme$callbackURL";
