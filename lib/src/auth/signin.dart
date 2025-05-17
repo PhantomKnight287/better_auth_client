@@ -68,10 +68,9 @@ class Signin<T extends User> {
     String? callbackURL,
     String? newUserCallbackURL,
     String? errorCallbackURL,
-    IdToken? idToken,
     List<String>? scopes,
   }) async {
-    assert(idToken != null || _scheme != null, "Either idToken or scheme must be provided");
+    assert(_scheme != null, "Either idToken or scheme must be provided");
     final body = {"provider": provider};
     if (callbackURL != null) {
       body["callbackURL"] = "$_scheme$callbackURL";
@@ -79,6 +78,27 @@ class Signin<T extends User> {
     final baseOptions = await _getOptions(isTokenRequired: false);
     baseOptions.headers ??= {};
     baseOptions.headers!["expo-origin"] = _scheme;
+    try {
+      final res = await _dio.post('/sign-in/social', data: body, options: baseOptions);
+      return SocialSignInResponse.fromJson(res.data);
+    } catch (e) {
+      final message = getErrorMessage(e);
+      throw message;
+    }
+  }
+
+  /// Sign in with a social provider with id token
+  ///
+  /// [provider] The social provider to use
+  ///
+  /// [idToken] The ID token to use for the social provider. Usually applicable to Apple and Google if you prefer to use native packages to handle the sign in process.
+  Future<SocialSignInResponse> socialWithIdToken({required String provider, required IdToken idToken}) async {
+    final body = {"provider": provider, "idToken": idToken.toJson()};
+    final baseOptions = await _getOptions(isTokenRequired: false);
+    baseOptions.headers ??= {};
+    if (_scheme != null) {
+      baseOptions.headers!["expo-origin"] = _scheme;
+    }
     try {
       final res = await _dio.post('/sign-in/social', data: body, options: baseOptions);
       return SocialSignInResponse.fromJson(res.data);
