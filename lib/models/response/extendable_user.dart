@@ -67,6 +67,11 @@ abstract class ExtendableUser extends User {
     super.isAnonymous,
     super.phoneNumber,
     super.phoneNumberVerified,
+    super.banExpires,
+    super.banReason,
+    super.banned,
+    super.customProperties,
+    super.role,
   });
 
   /// Factory method to create a specific user type from json
