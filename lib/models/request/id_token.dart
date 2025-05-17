@@ -2,7 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'id_token.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false)
 class IdToken {
   final String token;
   final String? nonce;

@@ -14,6 +14,6 @@ IdToken _$IdTokenFromJson(Map<String, dynamic> json) => IdToken(
 
 Map<String, dynamic> _$IdTokenToJson(IdToken instance) => <String, dynamic>{
   'token': instance.token,
-  'nonce': instance.nonce,
-  'accessToken': instance.accessToken,
+  if (instance.nonce case final value?) 'nonce': value,
+  if (instance.accessToken case final value?) 'accessToken': value,
 };
