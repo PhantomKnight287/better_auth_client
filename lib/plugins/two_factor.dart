@@ -29,6 +29,7 @@ class TwoFactorPlugin<T extends User> extends BasePlugin<T> {
       return TwoFactorTOTPURI.fromJson(response.data);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -47,6 +48,7 @@ class TwoFactorPlugin<T extends User> extends BasePlugin<T> {
       return TwoFactorVerifyTotp.fromJson(response.data);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -58,6 +60,7 @@ class TwoFactorPlugin<T extends User> extends BasePlugin<T> {
       return StatusResponse.fromJson(response.data);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -78,6 +81,7 @@ class TwoFactorPlugin<T extends User> extends BasePlugin<T> {
       return responseData;
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -101,6 +105,7 @@ class TwoFactorPlugin<T extends User> extends BasePlugin<T> {
       return SessionResponse.fromJson(response.data, User.fromJson);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -112,6 +117,7 @@ class TwoFactorPlugin<T extends User> extends BasePlugin<T> {
       return GenerateBackupCodes.fromJson(response.data);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -131,6 +137,7 @@ class TwoFactorPlugin<T extends User> extends BasePlugin<T> {
       return EnableTwoFactorResponse.fromJson(response.data);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -149,6 +156,7 @@ class TwoFactorPlugin<T extends User> extends BasePlugin<T> {
       return StatusResponse.fromJson(response.data);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }

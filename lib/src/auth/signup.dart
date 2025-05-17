@@ -43,6 +43,7 @@ class Signup<T extends User> {
       return user;
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }

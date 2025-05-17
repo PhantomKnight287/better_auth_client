@@ -46,6 +46,7 @@ class Signin<T extends User> {
       return user;
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -83,6 +84,7 @@ class Signin<T extends User> {
       return SocialSignInResponse.fromJson(res.data);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -104,6 +106,7 @@ class Signin<T extends User> {
       return SessionResponse.fromJson(res.data, _fromJsonUser);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -115,6 +118,7 @@ class Signin<T extends User> {
       return SessionResponse.fromJson(response.data, _fromJsonUser);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -140,6 +144,7 @@ class Signin<T extends User> {
       return SessionResponse.fromJson(response.data, _fromJsonUser);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -161,6 +166,7 @@ class Signin<T extends User> {
       return StatusResponse.fromJson(response.data);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -180,6 +186,7 @@ class Signin<T extends User> {
       return UserAndTokenResponse.fromJson(response.data);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }

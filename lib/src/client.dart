@@ -141,6 +141,7 @@ class BetterAuthClient<T extends User> {
       await tokenStore.saveToken(null);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -151,6 +152,7 @@ class BetterAuthClient<T extends User> {
       await _dio.post("/send-verification-email", data: {"email": email, "callbackURL": callbackURL});
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -161,6 +163,7 @@ class BetterAuthClient<T extends User> {
       await _dio.post("/forget-password", data: {"email": email, "callbackURL": callbackURL});
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -177,6 +180,7 @@ class BetterAuthClient<T extends User> {
       );
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -242,6 +246,7 @@ class BetterAuthClient<T extends User> {
       return SessionResponse.fromJson(response.data, _fromJsonUser);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -257,6 +262,7 @@ class BetterAuthClient<T extends User> {
       return VerifyEmailResponse.fromJson(response.data);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -279,6 +285,7 @@ class BetterAuthClient<T extends User> {
       );
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -308,6 +315,7 @@ class BetterAuthClient<T extends User> {
       return ChangePasswordResponse.fromJson(response.data);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -329,6 +337,7 @@ class BetterAuthClient<T extends User> {
       return BaseResponse.fromJson(response.data, (json) => null);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -351,6 +360,7 @@ class BetterAuthClient<T extends User> {
       return BaseResponse.fromJson(response.data, (json) => null);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -362,6 +372,7 @@ class BetterAuthClient<T extends User> {
       return response.data.map((e) => Session.fromJson(e)).toList();
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -375,6 +386,7 @@ class BetterAuthClient<T extends User> {
       return BaseResponse.fromJson(response.data, (json) => null);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -386,6 +398,7 @@ class BetterAuthClient<T extends User> {
       return BaseResponse.fromJson(response.data, (json) => null);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -397,6 +410,7 @@ class BetterAuthClient<T extends User> {
       return BaseResponse.fromJson(response.data, (json) => null);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -422,6 +436,7 @@ class BetterAuthClient<T extends User> {
       return SocialSignInResponse.fromJson(response.data);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -433,6 +448,7 @@ class BetterAuthClient<T extends User> {
       return response.data.map((e) => Account.fromJson(e)).toList();
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -448,6 +464,7 @@ class BetterAuthClient<T extends User> {
       return BaseResponse.fromJson(response.data, (json) => null);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -467,6 +484,7 @@ class BetterAuthClient<T extends User> {
       return BaseResponse.fromJson(response.data, (json) => null);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -487,6 +505,7 @@ class BetterAuthClient<T extends User> {
       return TokenRefresh.fromJson(response.data);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }

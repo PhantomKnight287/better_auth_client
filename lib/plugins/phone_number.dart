@@ -24,6 +24,7 @@ class PhoneNumberPlugin<T extends User> extends BasePlugin<T> {
       );
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -56,6 +57,7 @@ class PhoneNumberPlugin<T extends User> extends BasePlugin<T> {
       return UserAndTokenResponse.fromJson(response.data);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -69,6 +71,7 @@ class PhoneNumberPlugin<T extends User> extends BasePlugin<T> {
       return StatusResponse.fromJson(response.data);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -93,6 +96,7 @@ class PhoneNumberPlugin<T extends User> extends BasePlugin<T> {
       return StatusResponse.fromJson(response.data);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }

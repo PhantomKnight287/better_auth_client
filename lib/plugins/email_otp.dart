@@ -22,6 +22,7 @@ class EmailOtpPlugin<T extends User> extends BasePlugin<T> {
       return SuccessResponse.fromJson(response.data);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -37,6 +38,7 @@ class EmailOtpPlugin<T extends User> extends BasePlugin<T> {
       return UserAndTokenResponse.fromJson(response.data);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -57,6 +59,7 @@ class EmailOtpPlugin<T extends User> extends BasePlugin<T> {
       return SuccessResponse.fromJson(response.data);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
@@ -70,6 +73,7 @@ class EmailOtpPlugin<T extends User> extends BasePlugin<T> {
       return SuccessResponse.fromJson(response.data);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }

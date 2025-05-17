@@ -21,12 +21,12 @@ String dioErrorToMessage(DioException e) {
   }
 }
 
-String getErrorMessage(Object e) {
+String? getErrorMessage(Object e) {
   if (e is DioException) {
     if (e.response?.statusCode == 404) {
       return "Not found";
     }
     return e.response?.data?['message'] ?? e.response?.data?['error'] ?? "An unknown error occurred";
   }
-  return e.toString();
+  return null;
 }

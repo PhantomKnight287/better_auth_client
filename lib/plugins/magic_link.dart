@@ -20,6 +20,7 @@ class MagicLinkPlugin<T extends User> extends BasePlugin<T> {
       return SessionResponse.fromJson(response.data, fromJsonUser);
     } catch (e) {
       final message = getErrorMessage(e);
+      if (message == null) rethrow;
       throw message;
     }
   }
