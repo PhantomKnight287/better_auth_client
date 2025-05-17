@@ -92,7 +92,7 @@ class Signin<T extends User> {
   /// [provider] The social provider to use
   ///
   /// [idToken] The ID token to use for the social provider. Usually applicable to Apple and Google if you prefer to use native packages to handle the sign in process.
-  Future<SocialSignInResponse> socialWithIdToken({required String provider, required IdToken idToken}) async {
+  Future<SessionResponse> socialWithIdToken({required String provider, required IdToken idToken}) async {
     final body = {"provider": provider, "idToken": idToken.toJson()};
     final baseOptions = await _getOptions(isTokenRequired: false);
     baseOptions.headers ??= {};
@@ -101,7 +101,7 @@ class Signin<T extends User> {
     }
     try {
       final res = await _dio.post('/sign-in/social', data: body, options: baseOptions);
-      return SocialSignInResponse.fromJson(res.data);
+      return SessionResponse.fromJson(res.data, _fromJsonUser);
     } catch (e) {
       final message = getErrorMessage(e);
       throw message;
