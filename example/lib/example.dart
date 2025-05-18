@@ -3,16 +3,7 @@ import 'package:better_auth_client/better_auth_client.dart';
 class PremiumUser extends ExtendableUser {
   final bool premium;
 
-  PremiumUser({
-    required super.id,
-    required super.email,
-    required super.name,
-    super.image,
-    required super.createdAt,
-    required super.updatedAt,
-    super.emailVerified,
-    required this.premium,
-  });
+  PremiumUser({required super.id, required super.email, required super.name, super.image, required super.createdAt, required super.updatedAt, super.emailVerified, required this.premium});
 
   factory PremiumUser.fromJson(Map<String, dynamic> json) => PremiumUser(
     id: json['id'],
@@ -22,7 +13,7 @@ class PremiumUser extends ExtendableUser {
     createdAt: DateTime.parse(json['createdAt']),
     updatedAt: DateTime.parse(json['updatedAt']),
     emailVerified: json['emailVerified'],
-    premium: json['premium'],
+    premium: json['premium'] ?? false,
   );
 
   @override
@@ -48,18 +39,11 @@ class InMemoryTokenStore extends TokenStore {
   }
 }
 
-void main() async {
-  final client = BetterAuthClient<PremiumUser>(
-    baseUrl: "http://localhost:3000/api/auth",
-    tokenStore: InMemoryTokenStore(),
-    fromJsonUser: PremiumUser.fromJson,
-  );
+void test() async {
+  final client = BetterAuthClient<PremiumUser>(baseUrl: "http://localhost:3000/api/auth", tokenStore: InMemoryTokenStore(), fromJsonUser: PremiumUser.fromJson);
 
   try {
-    final response = await client.signIn.email(
-      email: 'test@mail.com',
-      password: 'password',
-    );
+    final response = await client.signIn.email(email: 'test@mail.com', password: 'password');
     print(response);
   } catch (e, stack) {
     print(e);
@@ -72,5 +56,7 @@ void main() async {
     print(e);
     print(stack);
   }
-  await client.phoneNumber.sendOTP(phoneNumber: "+1234567890");
+  final res = await client.oneTimeToken.generateToken();
+  final verify = await client.oneTimeToken.verifyToken(token: res.token);
+  print(verify);
 }

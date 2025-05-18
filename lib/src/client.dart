@@ -12,6 +12,7 @@ import 'package:better_auth_client/models/response/user.dart';
 import 'package:better_auth_client/models/response/verify_email.dart';
 import 'package:better_auth_client/plugins/email_otp.dart';
 import 'package:better_auth_client/plugins/magic_link.dart';
+import 'package:better_auth_client/plugins/one_time_token/main.dart';
 import 'package:better_auth_client/plugins/phone_number.dart';
 import 'package:better_auth_client/plugins/two_factor.dart';
 import 'package:better_auth_client/src/auth/signin.dart';
@@ -74,7 +75,12 @@ class BetterAuthClient<T extends User> {
   /// The email OTP plugin
   ///
   /// Requires [emailOtp] plugin to be installed server side
-  late final EmailOtpPlugin emailOtp;
+  late final EmailOtpPlugin<T> emailOtp;
+
+  /// The One-Time Token (OTT) plugin provides functionality to generate and verify secure, single-use session tokens. These are commonly used for across domains authentication.
+  ///
+  /// Requires [oneTimeToken] plugin to be installed server side
+  late final OneTimeTokenPlugin<T> oneTimeToken;
 
   /// Function to convert JSON to a custom user model
   /// If not provided, the default User.fromJson will be used
@@ -118,6 +124,12 @@ class BetterAuthClient<T extends User> {
       fromJsonUser: _fromJsonUser,
     );
     emailOtp = EmailOtpPlugin<T>(
+      dio: _dio,
+      getOptions: _getOptions,
+      setToken: tokenStore.saveToken,
+      fromJsonUser: _fromJsonUser,
+    );
+    oneTimeToken = OneTimeTokenPlugin<T>(
       dio: _dio,
       getOptions: _getOptions,
       setToken: tokenStore.saveToken,

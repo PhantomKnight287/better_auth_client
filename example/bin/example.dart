@@ -1,3 +1,5 @@
+import 'package:example/example.dart';
+
 void main(List<String> arguments) {
-  print('Hello world!');
+  test();
 }
