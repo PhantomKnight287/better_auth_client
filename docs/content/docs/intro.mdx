@@ -1,0 +1,80 @@
+---
+title: Introduction
+---
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+[Better Auth Client](https://pub.dev/packages/better_auth_client) is a client package for [Better Auth](https://better-auth.com). It allows you to use Better Auth in your Dart applications.
+
+<Callout type="warn">
+
+This is a pure dart package and does not take care of any flutter related configuration(s). You will have to manually add the required dependencies and configuration(s) in your flutter project
+
+</Callout>
+
+
+## Setup
+
+<Steps>
+
+<Step>
+
+Install the package
+
+```bash
+dart pub add better_auth_client
+```
+
+</Step>
+
+<Step>
+
+Creating a token store
+
+Since this package is pure dart, it does not bother with any token storage method. You have to implement your own token storage by extending `TokenStore` class.
+
+The below example shows how to implement an in-memory token store. You are free to use any storage method you want.
+
+```dart
+class InMemoryTokenStore extends TokenStore {
+  String? _token;
+
+  @override
+  Future<String> getToken() {
+    return Future.value(_token ?? "");
+  }
+
+  @override
+  Future<void> saveToken(String? token) {
+    _token = token;
+    return Future.value();
+  }
+}
+
+```
+
+</Step>
+
+<Step>
+
+Creating a client
+
+Now we need to create a client instance that we will use to make requests to the Better Auth server.
+
+```dart
+final client = BetterAuthClient(
+    baseUrl: "http://localhost:3000/api/auth",
+    tokenStore: InMemoryTokenStore(),
+);
+```
+
+</Step>
+</Steps>
+
+
+### Next steps
+
+The package's api is very similar to that of official better auth client, with some differences.
+
+Please refer to the sidebar for available methods.
+
+
