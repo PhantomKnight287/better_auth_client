@@ -8,6 +8,7 @@ formatter:
   indent_style: space
   line_length: 120
   indent_width: 2
+  trailing_commas: preserve
 analyzer:
   errors:
     unintended_html_in_doc_comment: ignore

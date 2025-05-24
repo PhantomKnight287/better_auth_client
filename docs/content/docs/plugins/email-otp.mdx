@@ -1,0 +1,65 @@
+---
+title: Email OTP
+description: The Email OTP plugin allows you to send one-time passwords to users via email.
+---
+
+## Usage
+
+### Send verification OTP
+
+Send verification OTP to email address of the user.
+
+
+
+```dart
+await client.emailOtp.sendVerificationOTP(email: "test@mail.com", type: "sign-in");
+```
+
+| Type | Description |
+|------|-------------|
+| "sign-in" | Send verification OTP to email address of the user for sign-in |
+| "email-verification" | Send verification OTP to email address of the user for email verification |
+| "forget-password" | Send verification OTP to email address of the user for forget password |
+
+
+### Verify Email
+
+Verify the OTP sent to the email address of the user.
+
+```dart
+await client.emailOtp.verifyEmail(email: "test@mail.com", otp: "123456");
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| email | String | The email address of the user |
+| otp | String | The OTP sent to the email address of the user |
+
+
+### Forget Password
+
+Start the forget password flow using email OTP.
+
+```dart
+await client.emailOtp.forgetPassword(email: "test@mail.com");
+``` 
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| email | String | The email address of the user |
+
+
+
+### Reset Password
+Reset the password of the user.
+
+```dart
+await client.emailOtp.resetPassword(email: "test@mail.com",otp: "123456",password: "password");
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| email | String | The email address of the user |
+| otp | String | The OTP sent to the email address of the user |
+| password | String | The new password of the user |
+

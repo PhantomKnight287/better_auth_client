@@ -5,12 +5,7 @@ import 'package:better_auth_client/plugins/base.dart';
 import 'package:better_auth_client/plugins/one_time_token/response/generate_token.dart';
 
 class OneTimeTokenPlugin<T extends User> extends BasePlugin<T> {
-  OneTimeTokenPlugin({
-    required super.dio,
-    required super.fromJsonUser,
-    required super.getOptions,
-    required super.setToken,
-  });
+  OneTimeTokenPlugin();
 
   /// Generate a one time token
   Future<GenerateTokenResponse> generateToken() async {

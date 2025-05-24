@@ -10,6 +10,8 @@ import 'package:better_auth_client/models/response/social_sign_in_response.dart'
 import 'package:better_auth_client/models/response/token_refresh.dart';
 import 'package:better_auth_client/models/response/user.dart';
 import 'package:better_auth_client/models/response/verify_email.dart';
+import 'package:better_auth_client/plugins/api_key/main.dart';
+import 'package:better_auth_client/plugins/base.dart';
 import 'package:better_auth_client/plugins/email_otp.dart';
 import 'package:better_auth_client/plugins/magic_link.dart';
 import 'package:better_auth_client/plugins/one_time_token/main.dart';
@@ -60,7 +62,7 @@ class BetterAuthClient<T extends User> {
   /// Two-Factor Authentication (2FA) plugin.
   ///
   /// Requires [twoFactor] plugin to be installed server side
-  late final TwoFactorPlugin twoFactor;
+  late final TwoFactorPlugin<T> twoFactor;
 
   /// The phone number plugin
   ///
@@ -82,16 +84,26 @@ class BetterAuthClient<T extends User> {
   /// Requires [oneTimeToken] plugin to be installed server side
   late final OneTimeTokenPlugin<T> oneTimeToken;
 
+  /// The API Key plugin
+  ///
+  /// Requires [apiKey] plugin to be installed server side
+  late final ApiKeyPlugin apiKey;
+
   /// Function to convert JSON to a custom user model
   /// If not provided, the default User.fromJson will be used
   final T Function(Map<String, dynamic>) _fromJsonUser;
+
+  /// The custom plugins to be used
+  final List<BasePlugin<T>> _customPlugins;
 
   BetterAuthClient({
     required this.baseUrl,
     required this.tokenStore,
     this.scheme,
     T Function(Map<String, dynamic>)? fromJsonUser,
-  }) : _fromJsonUser = fromJsonUser ?? User.fromJson as T Function(Map<String, dynamic>) {
+    List<BasePlugin<T>>? customPlugins,
+  }) : _fromJsonUser = fromJsonUser ?? User.fromJson as T Function(Map<String, dynamic>),
+       _customPlugins = customPlugins ?? [] {
     _internal();
   }
 
@@ -105,38 +117,68 @@ class BetterAuthClient<T extends User> {
       fromJsonUser: _fromJsonUser,
       getOptions: _getOptions,
     );
-    twoFactor = TwoFactorPlugin<T>(
-      dio: _dio,
-      getOptions: _getOptions,
-      setToken: tokenStore.saveToken,
-      fromJsonUser: _fromJsonUser,
-    );
-    phoneNumber = PhoneNumberPlugin<T>(
-      dio: _dio,
-      getOptions: _getOptions,
-      setToken: tokenStore.saveToken,
-      fromJsonUser: _fromJsonUser,
-    );
-    magicLink = MagicLinkPlugin<T>(
-      dio: _dio,
-      getOptions: _getOptions,
-      setToken: tokenStore.saveToken,
-      fromJsonUser: _fromJsonUser,
-    );
-    emailOtp = EmailOtpPlugin<T>(
-      dio: _dio,
-      getOptions: _getOptions,
-      setToken: tokenStore.saveToken,
-      fromJsonUser: _fromJsonUser,
-    );
-    oneTimeToken = OneTimeTokenPlugin<T>(
-      dio: _dio,
-      getOptions: _getOptions,
-      setToken: tokenStore.saveToken,
-      fromJsonUser: _fromJsonUser,
-    );
+
+    // Initialize built-in plugins
+    twoFactor =
+        TwoFactorPlugin<T>()
+          ..initialize(dio: _dio, getOptions: _getOptions, setToken: tokenStore.saveToken, fromJsonUser: _fromJsonUser);
+    phoneNumber =
+        PhoneNumberPlugin<T>()
+          ..initialize(dio: _dio, getOptions: _getOptions, setToken: tokenStore.saveToken, fromJsonUser: _fromJsonUser);
+    magicLink =
+        MagicLinkPlugin<T>()
+          ..initialize(dio: _dio, getOptions: _getOptions, setToken: tokenStore.saveToken, fromJsonUser: _fromJsonUser);
+    emailOtp =
+        EmailOtpPlugin<T>()
+          ..initialize(dio: _dio, getOptions: _getOptions, setToken: tokenStore.saveToken, fromJsonUser: _fromJsonUser);
+    oneTimeToken =
+        OneTimeTokenPlugin<T>()
+          ..initialize(dio: _dio, getOptions: _getOptions, setToken: tokenStore.saveToken, fromJsonUser: _fromJsonUser);
+    apiKey =
+        ApiKeyPlugin()
+          ..initialize(dio: _dio, getOptions: _getOptions, setToken: tokenStore.saveToken, fromJsonUser: _fromJsonUser);
+
+    // Initialize custom plugins
+    for (final plugin in _customPlugins) {
+      plugin.initialize(
+        dio: _dio,
+        getOptions: _getOptions,
+        setToken: tokenStore.saveToken,
+        fromJsonUser: _fromJsonUser,
+      );
+    }
   }
 
+  /// Register a custom plugin
+  ///
+  /// This is useful if you want to use a custom plugin that is not supported by this package.
+  /// The plugin will be initialized with the necessary internal values.
+  ///
+  /// [plugin] is the plugin instance to register
+  void registerCustomPlugin<P extends BasePlugin<T>>(P plugin) {
+    // Initialize the plugin with internal values
+    plugin.initialize(dio: _dio, getOptions: _getOptions, setToken: tokenStore.saveToken, fromJsonUser: _fromJsonUser);
+    _customPlugins.add(plugin);
+  }
+
+  /// Retrieve a custom plugin instance
+  ///
+  /// Returns the plugin instance of type P if it exists, otherwise throws an error.
+  /// Similar to Provider.of<P>() pattern.
+  ///
+  /// Example:
+  /// ```dart
+  /// final myPlugin = client.getCustomPlugin<MyCustomPlugin>();
+  /// ```
+  P getCustomPlugin<P extends BasePlugin<T>>() {
+    try {
+      return _customPlugins.firstWhere((plugin) => plugin is P) as P;
+    } catch (e) {
+      throw Exception('Plugin of type $P not found. Make sure to register it first using registerCustomPlugin.');
+    }
+  }
+
+  /// Get the options for the request
   Future<Options> _getOptions({bool isTokenRequired = true}) async {
     final token = await tokenStore.getToken();
     if (isTokenRequired) {

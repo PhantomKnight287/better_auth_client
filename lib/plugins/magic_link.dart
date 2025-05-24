@@ -4,12 +4,7 @@ import 'package:better_auth_client/models/response/user.dart';
 import 'package:better_auth_client/plugins/base.dart';
 
 class MagicLinkPlugin<T extends User> extends BasePlugin<T> {
-  MagicLinkPlugin({
-    required super.dio,
-    required super.getOptions,
-    required super.setToken,
-    required super.fromJsonUser,
-  });
+  MagicLinkPlugin();
 
   Future<SessionResponse<T>> verify({required String token, String? callbackURL}) async {
     try {

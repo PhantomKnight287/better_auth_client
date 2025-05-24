@@ -5,7 +5,7 @@ import 'package:better_auth_client/models/response/user_and_token_response.dart'
 import 'package:better_auth_client/plugins/base.dart';
 
 class EmailOtpPlugin<T extends User> extends BasePlugin<T> {
-  EmailOtpPlugin({required super.dio, required super.fromJsonUser, required super.getOptions, required super.setToken});
+  EmailOtpPlugin();
 
   /// Send verification OTP to email address of the user
   ///
@@ -32,7 +32,10 @@ class EmailOtpPlugin<T extends User> extends BasePlugin<T> {
   /// [email] The email address of the user
   ///
   /// [otp] The OTP sent to the user's email
-  Future<UserAndTokenResponse> verifyEmail({required String email, required String otp}) async {
+  Future<UserAndTokenResponse> verifyEmail({
+    required String email,
+    required String otp,
+  }) async {
     try {
       final response = await dio.post("/email-otp/verify-email", data: {"email": email, "otp": otp});
       return UserAndTokenResponse.fromJson(response.data);

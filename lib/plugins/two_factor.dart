@@ -9,12 +9,7 @@ import 'package:better_auth_client/models/response/user_and_token_response.dart'
 import 'package:better_auth_client/plugins/base.dart';
 
 class TwoFactorPlugin<T extends User> extends BasePlugin<T> {
-  TwoFactorPlugin({
-    required super.dio,
-    required super.getOptions,
-    required super.setToken,
-    required super.fromJsonUser,
-  });
+  TwoFactorPlugin();
 
   /// Get TOTP URI
   ///

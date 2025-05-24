@@ -1,0 +1,73 @@
+---
+title: Custom Plugin
+description: The Custom Plugin allows you to create a custom plugin for your application.
+---
+
+## Usage
+
+### Create a custom plugin
+
+To create a custom plugin, you need to extend the `BasePlugin` class.
+
+
+```dart
+class CatPlugin extends BasePlugin{
+    CatPlugin();
+
+    Future<dynamic> sendCat() async {
+        final res = await super.dio.post("/cat");
+        return res.data;
+    }
+}
+```
+
+
+### Register the plugin
+
+You need to register the plugin by calling `client.registerCustomPlugin`.
+
+```dart
+client.registerCustomPlugin(CatPlugin());
+```
+
+This calls the `initialize` method of the plugin(implemented by the `BasePlugin` class).
+
+### Using the plugin
+
+```dart
+final catPlugin = client.getCustomPlugin<CatPlugin>();
+await catPlugin.sendCat();
+```
+
+
+## Super members
+
+Each plugin has access to 4 super members:
+
+| Parameter | Type |
+|-----------|------|
+| dio | Dio 
+| getOptions | Function | 
+| setToken | Function | 
+| fromJsonUser | Function |
+
+
+### `dio`
+
+This points to internal dio instance of the Client. This already has base url configured. Any changes to this will affect all the api requests across the client. 
+
+### `getOptions`
+
+This function is used to get the base options for the request. This returns a `RequestOptions` object which has Authorization header.
+
+It accepts a boolean parameter `isTokenRequired` which is used to determine if the token is required for the request(throws assertion error if token is not present).
+
+### `setToken`
+
+This is used to set the token in the token store passed to the client instance.
+
+### `fromJsonUser`
+
+This is useful when you want to convert the user returned from the API to the user object. This method will, by default, be `User.fromJson` but if a custom `fromJsonUser` is provided to client instance, it will be used instead.
+
+If you still want to use the default `User.fromJson`, you can do it by calling `User.fromJson` in your plugin.

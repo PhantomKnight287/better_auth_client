@@ -14,6 +14,7 @@ Note: This repo will get most if not all of the updates on weekends or public ho
 - [x] Phone Number
 - [x] Email OTP
 - [x] One Time Token
+- [x] API Key
 
 ## Installation
 

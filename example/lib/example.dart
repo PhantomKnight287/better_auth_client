@@ -1,4 +1,5 @@
 import 'package:better_auth_client/better_auth_client.dart';
+import 'package:better_auth_client/plugins/base.dart';
 
 class PremiumUser extends ExtendableUser {
   final bool premium;
@@ -21,6 +22,14 @@ class PremiumUser extends ExtendableUser {
     final json = super.toJson();
     json['premium'] = premium;
     return json;
+  }
+}
+
+class CatPlugin extends BasePlugin<PremiumUser> {
+  CatPlugin();
+
+  Future<dynamic> sendCat() async {
+    print("Sending cat");
   }
 }
 
@@ -59,4 +68,15 @@ void test() async {
   final res = await client.oneTimeToken.generateToken();
   final verify = await client.oneTimeToken.verifyToken(token: res.token);
   print(verify);
+
+  // final key = await client.apiKey.create(name: "Test", prefix: "test");
+  // if (key != null) {
+  //   print(key);
+  // }
+  // final key = await client.apiKey.get(id: "non-existing-id");
+  // print(key);
+
+  client.registerCustomPlugin(CatPlugin());
+  final catPlugin = client.getCustomPlugin<CatPlugin>();
+  await catPlugin.sendCat();
 }
