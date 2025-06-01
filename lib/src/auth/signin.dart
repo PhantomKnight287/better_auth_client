@@ -103,6 +103,7 @@ class Signin<T extends User> {
     }
     try {
       final res = await _dio.post('/sign-in/social', data: body, options: baseOptions);
+      _setToken(res.data['token']);
       return UserAndTokenResponse.fromJson(res.data);
     } catch (e) {
       final message = getErrorMessage(e);
