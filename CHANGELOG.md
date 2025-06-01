@@ -1,3 +1,8 @@
+### 0.0.11
+
+- Improve documentation
+- Support for admin plugin
+
 ### 0.0.5
 
 - Added support for email OTP
