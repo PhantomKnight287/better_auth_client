@@ -1,0 +1,191 @@
+---
+title: Admin Plugin
+description: The Admin plugin provides a comprehensive set of administrative functions for user management in your application. It allows administrators to perform various operations such as creating users, managing user roles, banning/unbanning users, impersonating users, and more.
+---
+
+## Available Methods
+
+### User Management
+
+#### Create User
+Creates a new user in the system.
+
+```dart
+final response = await client.admin.createUser(
+  email: 'user@example.com',
+  password: 'securepassword',
+  name: 'John Doe',
+  role: 'user', // optional
+  data: {'customField': 'value'}, // optional
+);
+```
+
+#### List Users
+Retrieves a list of users with optional filtering, searching, and pagination.
+
+```dart
+final response = await client.admin.listUsers(
+  searchValue: 'john', // optional
+  searchField: 'name', // optional
+  searchOperator: SearchOperator.contains, // optional
+  limit: 10, // optional
+  offset: 0, // optional
+  sortBy: 'createdAt', // optional
+  sortDirection: 'desc', // optional
+  filterField: 'role', // optional
+  filterOperator: 'equals', // optional
+  filterValue: 'admin', // optional
+);
+```
+
+#### Remove User
+Permanently deletes a user and all associated data.
+
+```dart
+final response = await client.admin.removeUser(
+  userId: 'user123',
+);
+```
+
+### Role Management
+
+#### Set Role
+Updates a user's role.
+
+```dart
+final response = await client.admin.setRole(
+  userId: 'user123',
+  role: 'admin',
+);
+```
+
+### Session Management
+
+#### List User Sessions
+Retrieves all active sessions for a specific user.
+
+```dart
+final response = await client.admin.listUserSessions(
+  userId: 'user123',
+);
+```
+
+#### Revoke User Session
+Terminates a specific user session.
+
+```dart
+final response = await client.admin.revokeUserSession(
+  sessionToken: 'session123',
+);
+```
+
+#### Remove User Sessions
+Terminates all sessions for a specific user.
+
+```dart
+final response = await client.admin.removeUserSessions(
+  userId: 'user123',
+);
+```
+
+### User Moderation
+
+#### Ban User
+Bans a user for a specified duration.
+
+```dart
+final response = await client.admin.banUser(
+  userId: 'user123',
+  banReason: 'Violation of terms', // optional
+  banExpiresIn: 86400, // optional, in seconds (24 hours)
+);
+```
+
+#### Unban User
+Removes a ban from a user.
+
+```dart
+final response = await client.admin.unbanUser(
+  userId: 'user123',
+);
+```
+
+### User Impersonation
+
+<Callout type="info">
+  This requires proper setup of `getAdminToken` and `saveAdminToken` in the token store. Refer to the [Token Store](/docs/token-store) documentation for more details.
+</Callout>
+
+#### Impersonate User
+Temporarily assumes the identity of another user.
+
+```dart
+final response = await client.admin.impersonateUser(
+  userId: 'user123',
+);
+```
+
+#### Stop Impersonating
+Ends the current impersonation session.
+
+```dart
+await client.admin.stopImpersonating();
+```
+
+### Password Management
+
+#### Set User Password
+Updates a user's password.
+
+```dart
+final response = await client.admin.setUserPassword(
+  userId: 'user123',
+  newPassword: 'newSecurePassword',
+);
+```
+
+### Permission Management
+
+#### Check Permissions
+Verifies if the current user has specific permissions.
+
+```dart
+final response = await client.admin.hasPermission(
+  permissions: [
+    {'action': 'read', 'resource': 'users'},
+    {'action': 'write', 'resource': 'settings'},
+  ],
+);
+```
+
+#### Check User Permissions
+Verifies if a specific user or role has specific permissions.
+
+```dart
+final response = await client.admin.userHasPermission(
+  userId: 'user123', // optional, use either userId or role
+  role: 'admin', // optional, use either userId or role
+  permissions: [
+    {'action': 'read', 'resource': 'users'},
+    {'action': 'write', 'resource': 'settings'},
+  ],
+);
+```
+
+## Error Handling
+
+All methods in the Admin plugin throw exceptions when operations fail. The error messages are automatically extracted from the server response and thrown as exceptions. You should wrap all admin plugin calls in try-catch blocks:
+
+```dart
+try {
+  final response = await client.admin.createUser(
+    email: 'user@example.com',
+    password: 'password',
+    name: 'John Doe',
+  );
+  // Handle success
+} catch (e) {
+  // Handle error
+  print('Error: $e');
+}
+```

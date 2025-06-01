@@ -1,0 +1,110 @@
+---
+title: API Key Plugin
+description: Manage API keys for secure access to your application's API endpoints with support for rate limiting, permissions, and key rotation.
+---
+
+## Available Methods
+
+### Create API Key
+Creates a new API key with specified permissions and settings.
+
+```dart
+final response = await client.apiKey.create(
+  name: 'My API Key', // optional
+  expiresIn: 86400, // optional, in seconds
+  userId: 'user123', // optional, server-side only
+  prefix: 'myapp', // optional
+  remaining: 1000, // optional, server-side only
+  metadata: {'purpose': 'testing'}, // optional
+  refillAmount: 100, // optional, server-side only
+  refillInterval: 3600, // optional, server-side only
+  rateLimitTimeWindow: 60000, // optional, server-side only, in milliseconds
+  rateLimitMax: 100, // optional, server-side only
+  rateLimitEnabled: true, // optional, server-side only
+  permissions: { // optional
+    'users': ['read', 'write'],
+    'settings': ['read'],
+  },
+);
+```
+
+### Update API Key
+Updates an existing API key's settings.
+
+```dart
+final response = await client.apiKey.update(
+  keyId: 'key123',
+  name: 'Updated Key Name', // optional
+  expiresIn: 86400, // optional
+  userId: 'user123', // optional, server-side only
+  remaining: 1000, // optional, server-side only
+  metadata: {'purpose': 'production'}, // optional
+  refillAmount: 100, // optional, server-side only
+  refillInterval: 3600, // optional, server-side only
+  rateLimitTimeWindow: 60000, // optional, server-side only
+  rateLimitMax: 100, // optional, server-side only
+  rateLimitEnabled: true, // optional, server-side only
+  permissions: { // optional
+    'users': ['read'],
+    'settings': ['read', 'write'],
+  },
+);
+```
+
+### Delete API Key
+Deletes an API key.
+
+```dart
+final response = await client.apiKey.delete(
+  keyId: 'key123',
+);
+```
+
+### List API Keys
+Retrieves a list of all API keys.
+
+```dart
+final response = await client.apiKey.list();
+```
+
+## API Key Properties
+
+The API key object includes the following properties:
+
+- `id`: Unique identifier for the key
+- `createdAt`: Timestamp when the key was created
+- `updatedAt`: Timestamp when the key was last updated
+- `name`: Display name for the key
+- `prefix`: Key prefix
+- `start`: Start of the key
+- `key`: The actual API key
+- `enabled`: Whether the key is enabled
+- `expiresAt`: Expiration timestamp
+- `userId`: Associated user ID
+- `lastRefillAt`: Last refill timestamp
+- `lastRequest`: Last request timestamp
+- `metadata`: Custom metadata
+- `rateLimitMax`: Maximum requests per time window
+- `rateLimitTimeWindow`: Time window for rate limiting
+- `remaining`: Remaining requests
+- `refillAmount`: Amount to refill
+- `refillInterval`: Refill interval
+- `rateLimitEnabled`: Whether rate limiting is enabled
+- `requestCount`: Total request count
+- `permissions`: Map of resource permissions
+
+## Error Handling
+
+All methods in the API Key plugin throw exceptions when operations fail. The error messages are automatically extracted from the server response and thrown as exceptions. You should wrap all API key plugin calls in try-catch blocks:
+
+```dart
+try {
+  final response = await client.apiKey.create(
+    name: 'My API Key',
+    permissions: {'users': ['read']},
+  );
+  // Handle success
+} catch (e) {
+  // Handle error
+  print('Error: $e');
+} 

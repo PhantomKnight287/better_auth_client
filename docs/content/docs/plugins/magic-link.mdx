@@ -1,0 +1,32 @@
+---
+title: Magic Link Plugin
+description: Implement passwordless authentication using secure, time-limited magic links sent to users' email addresses.
+---
+
+## Available Methods
+
+### Verify Magic Link
+Verifies a magic link token and authenticates the user.
+
+```dart
+final response = await client.magicLink.verify(
+  token: 'magic-link-token',
+  callbackURL: 'https://your-app.com/callback', // optional
+);
+```
+
+## Error Handling
+
+All methods in the Magic Link plugin throw exceptions when operations fail. The error messages are automatically extracted from the server response and thrown as exceptions. You should wrap all magic link plugin calls in try-catch blocks:
+
+```dart
+try {
+  final response = await client.magicLink.verify(
+    token: 'magic-link-token',
+  );
+  // Handle success
+} catch (e) {
+  // Handle error
+  print('Error: $e');
+}
+``` 

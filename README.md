@@ -15,6 +15,7 @@ Note: This repo will get most if not all of the updates on weekends or public ho
 - [x] Email OTP
 - [x] One Time Token
 - [x] API Key
+- [x] Admin
 
 ## Installation
 
@@ -23,6 +24,8 @@ dart pub add better_auth_client
 ```
 
 ## Setup
+
+Read detailed documentation [here](https://better-auth-dart.vercel.app/)
 
 ### Client Side
 

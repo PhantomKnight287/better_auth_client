@@ -1,0 +1,54 @@
+---
+title: Token Store
+---
+The token store is used to store the token in the client instance. It is used to get and set the token in the token store passed to the client instance.
+
+The [`TokenStore`](https://pub.dev/documentation/better_auth_client/latest/models_token_store/TokenStore-class.html) is an abstract class hence it must be extended to be used. Below is an example of an in-memory token store.
+
+
+```dart
+class InMemoryTokenStore extends TokenStore {
+  String? _token;
+  String? _adminToken;
+
+  @override
+  Future<String> getToken() {
+    return Future.value(_token ?? "");
+  }
+
+  @override
+  Future<void> saveToken(String? token) {
+    _token = token;
+    return Future.value();
+  }
+
+  @override
+  Future<String> getAdminToken() {
+    return Future.value(_adminToken ?? "");
+  }
+
+  @override
+  Future<void> saveAdminToken(String? token) {
+    _adminToken = token;
+    return Future.value();
+  }
+}
+```
+
+### Methods 
+ 
+#### `getToken`
+
+This method is used to get the token from the token store.
+
+#### `saveToken`
+
+This method is used to save the token in the token store.
+
+#### `getAdminToken`
+
+This method is used to get the admin token from the token store. This can safely return empty string if you are not using the admin plugin.
+
+#### `saveAdminToken`
+
+This method is used to save the admin token in the token store. This can have an empty implementation if you are not using the admin plugin.
