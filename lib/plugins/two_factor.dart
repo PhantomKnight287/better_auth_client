@@ -72,7 +72,7 @@ class TwoFactorPlugin<T extends User> extends BasePlugin<T> {
         options: await super.getOptions(),
       );
       final responseData = UserAndTokenResponse.fromJson(response.data);
-      await super.setToken(responseData.token);
+      await super.tokenStore.saveToken(responseData.token);
       return responseData;
     } catch (e) {
       final message = getErrorMessage(e);

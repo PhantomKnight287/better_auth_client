@@ -1,0 +1,64 @@
+---
+title: Phone Number Plugin
+description: Implement phone number verification and password reset functionality using SMS-based one-time passwords.
+---
+
+## Available Methods
+
+### Send OTP
+Sends a one-time password to the user's phone number.
+
+```dart
+await client.phoneNumber.sendOTP(
+  phoneNumber: '+1234567890',
+);
+```
+
+### Verify Phone Number
+Verifies the phone number using the OTP sent to the user's phone.
+
+```dart
+final response = await client.phoneNumber.verifyPhoneNumber(
+  phoneNumber: '+1234567890',
+  code: '123456',
+  disableSession: false, // optional
+  updatePhoneNumber: true, // optional
+);
+```
+
+### Password Reset
+
+#### Forgot Password
+Initiates the password reset process by sending an OTP to the user's phone number.
+
+```dart
+final response = await client.phoneNumber.forgotPassword(
+  phoneNumber: '+1234567890',
+);
+```
+
+#### Reset Password
+Resets the user's password using the OTP sent to their phone number.
+
+```dart
+final response = await client.phoneNumber.resetPassword(
+  phoneNumber: '+1234567890',
+  otp: '123456',
+  newPassword: 'new-password',
+);
+```
+
+## Error Handling
+
+All methods in the Phone Number plugin throw exceptions when operations fail. The error messages are automatically extracted from the server response and thrown as exceptions. You should wrap all phone number plugin calls in try-catch blocks:
+
+```dart
+try {
+  await client.phoneNumber.sendOTP(
+    phoneNumber: '+1234567890',
+  );
+  // Handle success
+} catch (e) {
+  // Handle error
+  print('Error: $e');
+} 

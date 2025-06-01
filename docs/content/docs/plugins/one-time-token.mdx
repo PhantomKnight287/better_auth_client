@@ -1,0 +1,35 @@
+---
+title: One Time Token Plugin
+description: Generate and verify one-time tokens for secure, temporary access to your application's resources.
+---
+
+## Available Methods
+
+### Generate Token
+Generates a new one-time token.
+
+```dart
+final response = await client.oneTimeToken.generateToken();
+```
+
+### Verify Token
+Verifies a one-time token and creates a session.
+
+```dart
+final response = await client.oneTimeToken.verifyToken(
+  token: 'one-time-token',
+);
+```
+
+## Error Handling
+
+All methods in the One Time Token plugin throw exceptions when operations fail. The error messages are automatically extracted from the server response and thrown as exceptions. You should wrap all one time token plugin calls in try-catch blocks:
+
+```dart
+try {
+  final response = await client.oneTimeToken.generateToken();
+  // Handle success
+} catch (e) {
+  // Handle error
+  print('Error: $e');
+} 

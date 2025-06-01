@@ -48,7 +48,7 @@ Each plugin has access to 4 super members:
 |-----------|------|
 | dio | Dio 
 | getOptions | Function | 
-| setToken | Function | 
+| tokenStore | TokenStore | 
 | fromJsonUser | Function |
 
 
@@ -62,9 +62,9 @@ This function is used to get the base options for the request. This returns a `R
 
 It accepts a boolean parameter `isTokenRequired` which is used to determine if the token is required for the request(throws assertion error if token is not present).
 
-### `setToken`
+### `tokenStore`
 
-This is used to set the token in the token store passed to the client instance.
+This is used to get and set the token in the token store passed to the client instance.
 
 ### `fromJsonUser`
 

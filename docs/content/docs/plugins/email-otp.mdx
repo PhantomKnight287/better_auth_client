@@ -1,65 +1,64 @@
 ---
-title: Email OTP
-description: The Email OTP plugin allows you to send one-time passwords to users via email.
+title: Email OTP Plugin
+description: Implement email-based one-time password authentication for secure user verification and password reset functionality.
 ---
 
-## Usage
+## Available Methods
 
-### Send verification OTP
-
-Send verification OTP to email address of the user.
-
-
+### Send Verification OTP
+Sends a one-time password to the user's email address for verification.
 
 ```dart
-await client.emailOtp.sendVerificationOTP(email: "test@mail.com", type: "sign-in");
+final response = await client.emailOtp.sendVerificationOTP(
+  email: 'user@example.com',
+  type: 'sign-in', // Can be 'sign-in', 'email-verification', or 'forget-password'
+);
 ```
-
-| Type | Description |
-|------|-------------|
-| "sign-in" | Send verification OTP to email address of the user for sign-in |
-| "email-verification" | Send verification OTP to email address of the user for email verification |
-| "forget-password" | Send verification OTP to email address of the user for forget password |
-
 
 ### Verify Email
-
-Verify the OTP sent to the email address of the user.
+Verifies the email address using the OTP sent to the user's email.
 
 ```dart
-await client.emailOtp.verifyEmail(email: "test@mail.com", otp: "123456");
+final response = await client.emailOtp.verifyEmail(
+  email: 'user@example.com',
+  otp: '123456',
+);
 ```
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| email | String | The email address of the user |
-| otp | String | The OTP sent to the email address of the user |
+### Password Reset
 
-
-### Forget Password
-
-Start the forget password flow using email OTP.
+#### Forget Password
+Initiates the password reset process by sending an OTP to the user's email.
 
 ```dart
-await client.emailOtp.forgetPassword(email: "test@mail.com");
-``` 
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| email | String | The email address of the user |
-
-
-
-### Reset Password
-Reset the password of the user.
-
-```dart
-await client.emailOtp.resetPassword(email: "test@mail.com",otp: "123456",password: "password");
+final response = await client.emailOtp.forgetPassword(
+  email: 'user@example.com',
+);
 ```
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| email | String | The email address of the user |
-| otp | String | The OTP sent to the email address of the user |
-| password | String | The new password of the user |
+#### Reset Password
+Resets the user's password using the OTP sent to their email.
 
+```dart
+final response = await client.emailOtp.resetPassword(
+  email: 'user@example.com',
+  otp: '123456',
+  password: 'new-password',
+);
+```
+
+## Error Handling
+
+All methods in the Email OTP plugin throw exceptions when operations fail. The error messages are automatically extracted from the server response and thrown as exceptions. You should wrap all email OTP plugin calls in try-catch blocks:
+
+```dart
+try {
+  final response = await client.emailOtp.sendVerificationOTP(
+    email: 'user@example.com',
+    type: 'sign-in',
+  );
+  // Handle success
+} catch (e) {
+  // Handle error
+  print('Error: $e');
+} 

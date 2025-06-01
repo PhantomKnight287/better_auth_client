@@ -1,0 +1,103 @@
+---
+title: Two Factor Authentication Plugin
+description: Add an extra layer of security to your application with two-factor authentication using TOTP, OTP, and backup codes.
+---
+
+## Available Methods
+
+### TOTP (Time-based One-Time Password)
+
+#### Get TOTP URI
+Generates a TOTP URI that can be used with authenticator apps like Google Authenticator.
+
+```dart
+final response = await client.twoFactor.getTotpUri(
+  password: 'your-password',
+);
+```
+
+#### Verify TOTP
+Verifies a TOTP code entered by the user.
+
+```dart
+final response = await client.twoFactor.verifyTotp(
+  code: '123456',
+  trustDevice: true, // optional, defaults to false
+);
+```
+
+### OTP (One-Time Password)
+
+#### Send OTP
+Sends a one-time password to the user's email or phone.
+
+```dart
+final response = await client.twoFactor.sendOtp();
+```
+
+#### Verify OTP
+Verifies the OTP code entered by the user.
+
+```dart
+final response = await client.twoFactor.verifyOtp(
+  code: '123456',
+  trustDevice: true, // optional, defaults to false
+);
+```
+
+### Backup Codes
+
+#### Generate Backup Codes
+Generates a set of backup codes that can be used to access the account if the primary 2FA method is unavailable.
+
+```dart
+final response = await client.twoFactor.generateBackupCodes();
+```
+
+#### Verify Backup Code
+Verifies a backup code entered by the user.
+
+```dart
+final response = await client.twoFactor.verifyBackUpCode(
+  code: 'backup-code',
+  trustDevice: true, // optional, defaults to false
+  disableSession: false, // optional, defaults to false
+);
+```
+
+### Enable/Disable 2FA
+
+#### Enable Two Factor
+Enables two-factor authentication for the user's account.
+
+```dart
+final response = await client.twoFactor.enableTwoFactor(
+  password: 'your-password',
+  issuer: 'Your App Name', // optional
+);
+```
+
+#### Disable Two Factor
+Disables two-factor authentication for the user's account.
+
+```dart
+final response = await client.twoFactor.disableTwoFactor(
+  password: 'your-password',
+);
+```
+
+## Error Handling
+
+All methods in the Two Factor plugin throw exceptions when operations fail. The error messages are automatically extracted from the server response and thrown as exceptions. You should wrap all two factor plugin calls in try-catch blocks:
+
+```dart
+try {
+  final response = await client.twoFactor.verifyTotp(
+    code: '123456',
+  );
+  // Handle success
+} catch (e) {
+  // Handle error
+  print('Error: $e');
+}
+``` 

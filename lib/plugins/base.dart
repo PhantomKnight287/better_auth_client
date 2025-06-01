@@ -1,9 +1,10 @@
+import 'package:better_auth_client/better_auth_client.dart';
 import 'package:dio/dio.dart';
 
 abstract class BasePlugin<T> {
   late final Dio dio;
   late final Future<Options> Function({bool isTokenRequired}) getOptions;
-  late final Future<void> Function(String token) setToken;
+  late final TokenStore tokenStore;
   late final T Function(Map<String, dynamic> json) fromJsonUser;
 
   BasePlugin();
@@ -11,12 +12,12 @@ abstract class BasePlugin<T> {
   void initialize({
     required Dio dio,
     required Future<Options> Function({bool isTokenRequired}) getOptions,
-    required Future<void> Function(String token) setToken,
+    required TokenStore tokenStore,
     required T Function(Map<String, dynamic> json) fromJsonUser,
   }) {
     this.dio = dio;
     this.getOptions = getOptions;
-    this.setToken = setToken;
+    this.tokenStore = tokenStore;
     this.fromJsonUser = fromJsonUser;
   }
 }

@@ -10,6 +10,7 @@ import 'package:better_auth_client/models/response/social_sign_in_response.dart'
 import 'package:better_auth_client/models/response/token_refresh.dart';
 import 'package:better_auth_client/models/response/user.dart';
 import 'package:better_auth_client/models/response/verify_email.dart';
+import 'package:better_auth_client/plugins/admin/main.dart';
 import 'package:better_auth_client/plugins/api_key/main.dart';
 import 'package:better_auth_client/plugins/base.dart';
 import 'package:better_auth_client/plugins/email_otp.dart';
@@ -89,6 +90,11 @@ class BetterAuthClient<T extends User> {
   /// Requires [apiKey] plugin to be installed server side
   late final ApiKeyPlugin apiKey;
 
+  /// The Admin plugin
+  ///
+  /// Requires [admin] plugin to be installed server side
+  late final AdminPlugin<T> admin;
+
   /// Function to convert JSON to a custom user model
   /// If not provided, the default User.fromJson will be used
   final T Function(Map<String, dynamic>) _fromJsonUser;
@@ -121,29 +127,31 @@ class BetterAuthClient<T extends User> {
     // Initialize built-in plugins
     twoFactor =
         TwoFactorPlugin<T>()
-          ..initialize(dio: _dio, getOptions: _getOptions, setToken: tokenStore.saveToken, fromJsonUser: _fromJsonUser);
+          ..initialize(dio: _dio, getOptions: _getOptions, tokenStore: tokenStore, fromJsonUser: _fromJsonUser);
     phoneNumber =
         PhoneNumberPlugin<T>()
-          ..initialize(dio: _dio, getOptions: _getOptions, setToken: tokenStore.saveToken, fromJsonUser: _fromJsonUser);
+          ..initialize(dio: _dio, getOptions: _getOptions, tokenStore: tokenStore, fromJsonUser: _fromJsonUser);
     magicLink =
         MagicLinkPlugin<T>()
-          ..initialize(dio: _dio, getOptions: _getOptions, setToken: tokenStore.saveToken, fromJsonUser: _fromJsonUser);
+          ..initialize(dio: _dio, getOptions: _getOptions, tokenStore: tokenStore, fromJsonUser: _fromJsonUser);
     emailOtp =
         EmailOtpPlugin<T>()
-          ..initialize(dio: _dio, getOptions: _getOptions, setToken: tokenStore.saveToken, fromJsonUser: _fromJsonUser);
+          ..initialize(dio: _dio, getOptions: _getOptions, tokenStore: tokenStore, fromJsonUser: _fromJsonUser);
     oneTimeToken =
         OneTimeTokenPlugin<T>()
-          ..initialize(dio: _dio, getOptions: _getOptions, setToken: tokenStore.saveToken, fromJsonUser: _fromJsonUser);
+          ..initialize(dio: _dio, getOptions: _getOptions, tokenStore: tokenStore, fromJsonUser: _fromJsonUser);
     apiKey =
         ApiKeyPlugin()
-          ..initialize(dio: _dio, getOptions: _getOptions, setToken: tokenStore.saveToken, fromJsonUser: _fromJsonUser);
-
+          ..initialize(dio: _dio, getOptions: _getOptions, tokenStore: tokenStore, fromJsonUser: _fromJsonUser);
+    admin =
+        AdminPlugin<T>()
+          ..initialize(dio: _dio, getOptions: _getOptions, tokenStore: tokenStore, fromJsonUser: _fromJsonUser);
     // Initialize custom plugins
     for (final plugin in _customPlugins) {
       plugin.initialize(
         dio: _dio,
         getOptions: _getOptions,
-        setToken: tokenStore.saveToken,
+        tokenStore: tokenStore,
         fromJsonUser: _fromJsonUser,
       );
     }
@@ -157,7 +165,7 @@ class BetterAuthClient<T extends User> {
   /// [plugin] is the plugin instance to register
   void registerCustomPlugin<P extends BasePlugin<T>>(P plugin) {
     // Initialize the plugin with internal values
-    plugin.initialize(dio: _dio, getOptions: _getOptions, setToken: tokenStore.saveToken, fromJsonUser: _fromJsonUser);
+    plugin.initialize(dio: _dio, getOptions: _getOptions, tokenStore: tokenStore, fromJsonUser: _fromJsonUser);
     _customPlugins.add(plugin);
   }
 
