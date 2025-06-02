@@ -1,4 +1,4 @@
-### 0.0.11
+### 0.11.1
 
 - Improve documentation
 - Support for admin plugin
