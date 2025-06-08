@@ -19,7 +19,6 @@ class ApiKeyPlugin extends BasePlugin {
   /// [rateLimitTimeWindow] The duration in milliseconds where each request is counted. Once the `maxRequests` is reached, the request will be rejected until the `timeWindow` has passed, at which point the `timeWindow` will be reset. Server Only Property.
   /// [rateLimitMax] The maximum amount of requests allowed within a window. Once the `maxRequests` is reached, the request will be rejected until the `timeWindow` has passed, at which point the `timeWindow` will be reset. Server Only Property
   /// [rateLimitEnabled] Whether the key has rate limiting enabled. Server Only Property.
-  /// [permissions] The permissions of the API Key
   Future<ApiKey> create({
     String? name,
 
@@ -42,8 +41,6 @@ class ApiKeyPlugin extends BasePlugin {
     int? rateLimitMax,
 
     bool? rateLimitEnabled,
-
-    Map<String, List<String>>? permissions,
   }) async {
     try {
       final body = {};
@@ -58,7 +55,6 @@ class ApiKeyPlugin extends BasePlugin {
       if (rateLimitTimeWindow != null) body['rateLimitTimeWindow'] = rateLimitTimeWindow;
       if (rateLimitMax != null) body['rateLimitMax'] = rateLimitMax;
       if (rateLimitEnabled != null) body['rateLimitEnabled'] = rateLimitEnabled;
-      if (permissions != null) body['permissions'] = permissions;
 
       final res = await super.dio.post(
         '/api-key/create',
@@ -104,7 +100,6 @@ class ApiKeyPlugin extends BasePlugin {
     int? rateLimitTimeWindow,
     int? rateLimitMax,
     bool? rateLimitEnabled,
-    Map<String, List<String>>? permissions,
   }) async {
     try {
       final Map<String, dynamic> body = {'keyId': keyId};
@@ -118,7 +113,6 @@ class ApiKeyPlugin extends BasePlugin {
       if (rateLimitTimeWindow != null) body['rateLimitTimeWindow'] = rateLimitTimeWindow;
       if (rateLimitMax != null) body['rateLimitMax'] = rateLimitMax;
       if (rateLimitEnabled != null) body['rateLimitEnabled'] = rateLimitEnabled;
-      if (permissions != null) body['permissions'] = permissions;
 
       final res = await super.dio.post(
         '/api-key/update',

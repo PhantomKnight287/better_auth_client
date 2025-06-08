@@ -12,6 +12,7 @@ import 'package:better_auth_client/models/response/user.dart';
 import 'package:better_auth_client/models/response/verify_email.dart';
 import 'package:better_auth_client/plugins/admin/main.dart';
 import 'package:better_auth_client/plugins/api_key/main.dart';
+import 'package:better_auth_client/plugins/organization/main.dart';
 import 'package:better_auth_client/plugins/base.dart';
 import 'package:better_auth_client/plugins/email_otp.dart';
 import 'package:better_auth_client/plugins/magic_link.dart';
@@ -95,6 +96,11 @@ class BetterAuthClient<T extends User> {
   /// Requires [admin] plugin to be installed server side
   late final AdminPlugin<T> admin;
 
+  /// The Organization plugin
+  ///
+  /// Requires [organization] plugin to be installed server side
+  late final OrganizationPlugin organization;
+
   /// Function to convert JSON to a custom user model
   /// If not provided, the default User.fromJson will be used
   final T Function(Map<String, dynamic>) _fromJsonUser;
@@ -145,6 +151,9 @@ class BetterAuthClient<T extends User> {
           ..initialize(dio: _dio, getOptions: _getOptions, tokenStore: tokenStore, fromJsonUser: _fromJsonUser);
     admin =
         AdminPlugin<T>()
+          ..initialize(dio: _dio, getOptions: _getOptions, tokenStore: tokenStore, fromJsonUser: _fromJsonUser);
+    organization =
+        OrganizationPlugin()
           ..initialize(dio: _dio, getOptions: _getOptions, tokenStore: tokenStore, fromJsonUser: _fromJsonUser);
     // Initialize custom plugins
     for (final plugin in _customPlugins) {
