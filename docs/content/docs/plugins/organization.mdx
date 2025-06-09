@@ -1,0 +1,222 @@
+---
+title: Organization Plugin
+description: Manage organizations, members, and invitations with comprehensive organization management features including role-based access control, member management, and organization settings.
+---
+
+## Available Methods
+
+### Organization Management
+
+#### Create Organization
+Creates a new organization with specified details.
+
+```dart
+final response = await client.organization.create(
+  name: 'My Organization',
+  slug: 'my-org',
+  logo: 'https://example.com/logo.png', // optional
+  metadata: {'key': 'value'}, // optional
+  keepCurrentActiveOrganization: true, // optional
+);
+```
+
+#### Update Organization
+Updates an existing organization's details.
+
+```dart
+final response = await client.organization.update(
+  data: UpdateOrganizationRequest(
+    name: 'Updated Name',
+    logo: 'https://example.com/new-logo.png',
+  ),
+  organizationId: 'org_123',
+);
+```
+
+#### Delete Organization
+Deletes an organization permanently.
+
+```dart
+await client.organization.delete(
+  organizationId: 'org_123',
+);
+```
+
+#### Set Active Organization
+Sets an organization as the active organization for the current session. You must provide either `organizationId` or `organizationSlug`.
+
+```dart
+// Using organizationId
+await client.organization.setActive(
+  organizationId: 'org_123',
+);
+
+// OR using organizationSlug
+await client.organization.setActive(
+  organizationSlug: 'my-org',
+);
+
+// This will throw an assertion error:
+// await client.organization.setActive(); // Error: Either organizationId or organizationSlug must be provided
+```
+
+**Note:** The method includes an assertion that requires either `organizationId` or `organizationSlug` to be provided. If neither is provided, it will throw an assertion error.
+
+### Organization Information
+
+#### Get Full Organization
+Retrieves complete details of an organization.
+
+```dart
+final organization = await client.organization.getFullOrganization(
+  organizationId: 'org_123', // optional
+  organizationSlug: 'my-org', // optional
+);
+```
+
+#### Get All Organizations
+Retrieves a list of all organizations the user has access to.
+
+```dart
+final organizations = await client.organization.getAllOrganizations();
+```
+
+#### Check Slug Availability
+Verifies if an organization slug is available for use.
+
+```dart
+final response = await client.organization.checkSlug(
+  slug: 'my-org',
+);
+```
+
+### Member Management
+
+#### Invite Member
+Sends an invitation to join the organization.
+
+```dart
+final invitation = await client.organization.inviteMember(
+  email: 'member@example.com',
+  role: 'member',
+  organizationId: 'org_123', // optional
+  resend: true, // optional
+  teamId: 'team_123', // optional
+);
+```
+
+#### Remove Member
+Removes a member from the organization.
+
+```dart
+final response = await client.organization.removeMember(
+  memberIdOrEmail: 'member@example.com',
+  organizationId: 'org_123', // optional
+);
+```
+
+#### Update Member Role
+Changes a member's role within the organization.
+
+```dart
+final response = await client.organization.updateMemberRole(
+  role: 'admin',
+  memberId: 'member_123',
+  organizationId: 'org_123', // optional
+);
+```
+
+#### Get Active Member
+Retrieves information about the currently active member.
+
+```dart
+final member = await client.organization.getActiveMember();
+```
+
+#### Leave Organization
+Allows the current member to leave an organization.
+
+```dart
+await client.organization.leaveOrganization(
+  organizationId: 'org_123',
+);
+```
+
+### Invitation Management
+
+#### Get Invitation
+Retrieves details of a specific invitation.
+
+```dart
+final invitation = await client.organization.getInvitation(
+  invitationId: 'inv_123',
+);
+```
+
+#### Accept Invitation
+Accepts an organization invitation.
+
+```dart
+final response = await client.organization.acceptInvitation(
+  invitationId: 'inv_123',
+);
+```
+
+#### Reject Invitation
+Declines an organization invitation.
+
+```dart
+final response = await client.organization.rejectInvitation(
+  invitationId: 'inv_123',
+);
+```
+
+#### Cancel Invitation
+Cancels a pending invitation.
+
+```dart
+await client.organization.cancelInvitation(
+  invitationId: 'inv_123',
+);
+```
+
+#### Get All Invitations
+Retrieves all pending invitations.
+
+```dart
+final invitations = await client.organization.getAllInvitations();
+```
+
+### Permissions
+
+#### Check User Permissions
+Verifies if the user has specific permissions.
+
+```dart
+final response = await client.organization.hasPermission(
+  permissions: [
+    {'action': 'read', 'resource': 'organization'},
+    {'action': 'write', 'resource': 'members'},
+  ],
+);
+```
+
+## Error Handling
+
+All methods in the Organization plugin throw exceptions when operations fail. The error messages are automatically extracted from the server response and thrown as exceptions. You should wrap all organization plugin calls in try-catch blocks:
+
+```dart
+try {
+  final organization = await client.organization.getFullOrganization(
+    organizationId: 'org_123',
+  );
+  // Handle success
+} catch (e) {
+  // Handle error
+  print('Error: $e');
+}
+```
+
+## Authentication
+
+All methods require authentication and will automatically include the necessary authentication token in the requests. The token is managed by the base plugin class. Make sure the user is authenticated before calling these methods.

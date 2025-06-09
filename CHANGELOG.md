@@ -1,3 +1,7 @@
+### 0.12.0
+
+- Added support for organization plugin
+
 ### 0.11.1
 
 - Improve documentation

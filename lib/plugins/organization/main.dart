@@ -58,7 +58,7 @@ class OrganizationPlugin extends BasePlugin {
   /// [metadata] The metadata of the organization
   /// [slug] The slug of the organization
   Future<UpdateOrganizationResponse> update({
-    required UpdateOrganizationRequest request,
+    required UpdateOrganizationRequest data,
     required String organizationId,
   }) async {
     try {
@@ -66,7 +66,7 @@ class OrganizationPlugin extends BasePlugin {
         "/organization/update",
         data: {
           "organizationId": organizationId,
-          "data": request.toJson(),
+          "data": data.toJson().removeWhere((key, value) => value == null),
         },
         options: await getOptions(isTokenRequired: true),
       );
@@ -275,6 +275,7 @@ class OrganizationPlugin extends BasePlugin {
       final response = await dio.get(
         "/organization/check-slug",
         data: {"slug": slug},
+        options: await getOptions(isTokenRequired: true),
       );
       return StatusResponse.fromJson(response.data);
     } catch (e) {
@@ -319,7 +320,11 @@ class OrganizationPlugin extends BasePlugin {
     try {
       final response = await dio.post(
         "/organization/update-member-role",
-        data: {"role": role, "memberId": memberId, "organizationId": organizationId},
+        data: {
+          "role": role,
+          "memberId": memberId,
+          "organizationId": organizationId,
+        }..removeWhere((key, value) => value == null),
         options: await getOptions(isTokenRequired: true),
       );
       return UpdateMemberRoleResponse.fromJson(response.data);
@@ -380,7 +385,7 @@ class OrganizationPlugin extends BasePlugin {
   /// Check if user has a permission
   ///
   /// [permissions] The permissions to check for
-  Future<SuccessResponse> userHasPermission({
+  Future<SuccessResponse> hasPermission({
     required List<Map<String, dynamic>> permissions,
   }) async {
     try {
