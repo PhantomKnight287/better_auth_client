@@ -94,9 +94,15 @@ class Signin<T extends User> {
   /// [provider] The social provider to use
   ///
   /// [idToken] The ID token to use for the social provider. Usually applicable to Apple and Google if you prefer to use native packages to handle the sign in process.
-  Future<UserAndTokenResponse> socialWithIdToken({required String provider, required IdToken idToken}) async {
+  ///
+  /// [linkToCurrentSession] If true, sends the current bearer token with the request to link the social account to the current anonymous user. Used for anonymous account linking.
+  Future<UserAndTokenResponse> socialWithIdToken({
+    required String provider,
+    required IdToken idToken,
+    bool linkToCurrentSession = false,
+  }) async {
     final body = {"provider": provider, "idToken": idToken.toJson()};
-    final baseOptions = await _getOptions(isTokenRequired: false);
+    final baseOptions = await _getOptions(isTokenRequired: linkToCurrentSession);
     baseOptions.headers ??= {};
     if (_scheme != null) {
       baseOptions.headers!["expo-origin"] = _scheme;
