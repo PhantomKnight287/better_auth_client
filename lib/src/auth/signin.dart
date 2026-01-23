@@ -112,33 +112,6 @@ class Signin<T extends User> {
     }
   }
 
-  /// Link an anonymous account with a social provider using id token
-  ///
-  /// This method sends the current bearer token with the request so Better Auth
-  /// knows the user is logged in as anonymous and can link the accounts.
-  ///
-  /// [provider] The social provider to use (e.g., 'google', 'apple')
-  ///
-  /// [idToken] The ID token from the social provider
-  Future<UserAndTokenResponse> linkSocialWithIdToken({required String provider, required IdToken idToken}) async {
-    final body = {"provider": provider, "idToken": idToken.toJson()};
-    // Use isTokenRequired: true to send the current bearer token
-    final baseOptions = await _getOptions(isTokenRequired: true);
-    baseOptions.headers ??= {};
-    if (_scheme != null) {
-      baseOptions.headers!["expo-origin"] = _scheme;
-    }
-    try {
-      final res = await _dio.post('/sign-in/social', data: body, options: baseOptions);
-      _setToken(res.data['token']);
-      return UserAndTokenResponse.fromJson(res.data);
-    } catch (e) {
-      final message = getErrorMessage(e);
-      if (message == null) rethrow;
-      throw message;
-    }
-  }
-
   /// Sign in anonymously
   Future<UserAndTokenResponse> anonymous() async {
     try {
