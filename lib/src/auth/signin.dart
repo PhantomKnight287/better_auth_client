@@ -113,10 +113,11 @@ class Signin<T extends User> {
   }
 
   /// Sign in anonymously
-  Future<SessionResponse<T>> anonymous() async {
+  Future<UserAndTokenResponse> anonymous() async {
     try {
       final response = await _dio.post("/sign-in/anonymous", options: await _getOptions(isTokenRequired: false));
-      return SessionResponse.fromJson(response.data, _fromJsonUser);
+      _setToken(response.data['token']);
+      return UserAndTokenResponse.fromJson(response.data);
     } catch (e) {
       final message = getErrorMessage(e);
       if (message == null) rethrow;
