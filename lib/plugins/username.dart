@@ -1,5 +1,6 @@
 import 'package:better_auth_client/better_auth_client.dart';
 import 'package:better_auth_client/helpers/dio.dart';
+import 'package:better_auth_client/models/response/user_and_token_response.dart';
 import 'package:better_auth_client/plugins/base.dart';
 
 /// Username plugin for better-auth.
@@ -18,7 +19,7 @@ class UsernamePlugin<T extends User> extends BasePlugin<T> {
   /// [password] The password of the user
   ///
   /// [rememberMe] Whether to remember the user
-  Future<SessionResponse<T>> signIn({
+  Future<UserAndTokenResponse> signIn({
     required String username,
     required String password,
     bool? rememberMe,
@@ -35,7 +36,7 @@ class UsernamePlugin<T extends User> extends BasePlugin<T> {
       );
       final body = response.data;
       await tokenStore.saveToken(body["token"]);
-      return SessionResponse.fromJson(body, fromJsonUser);
+      return UserAndTokenResponse.fromJson(body);
     } catch (e) {
       final message = getErrorMessage(e);
       if (message == null) rethrow;
