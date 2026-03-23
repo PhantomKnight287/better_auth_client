@@ -1,0 +1,50 @@
+---
+title: Username Plugin
+description: Allow users to sign in using their username and password instead of email.
+---
+
+The Username plugin requires the [`username`](https://www.better-auth.com/docs/plugins/username) plugin to be installed on your Better Auth server.
+
+## Sign Up
+
+When the username plugin is enabled on the server, you can pass a `username` (and optionally `displayUsername`) during email sign up:
+
+```dart
+final user = await client.signUp.email(
+  name: 'John Doe',
+  email: 'john@example.com',
+  password: 'password123',
+  username: 'johndoe',
+  displayUsername: 'JohnDoe', // optional, case-preserved display name
+);
+```
+
+## Available Methods
+
+### Sign In with Username
+Signs in a user using their username and password.
+
+```dart
+final response = await client.username.signIn(
+  username: 'johndoe',
+  password: 'password123',
+  rememberMe: true, // optional
+);
+```
+
+## Error Handling
+
+All methods in the Username plugin throw exceptions when operations fail. The error messages are automatically extracted from the server response and thrown as exceptions. You should wrap all username plugin calls in try-catch blocks:
+
+```dart
+try {
+  final response = await client.username.signIn(
+    username: 'johndoe',
+    password: 'password123',
+  );
+  // Handle success
+} catch (e) {
+  // Handle error
+  print('Error: $e');
+}
+```

@@ -19,17 +19,26 @@ class Signup<T extends User> {
   /// [password] The password of the user
   /// [image] The image of the user
   /// [username] The username of the user
+  /// [displayUsername] The display username of the user
   Future<T> email({
     required String name,
     required String email,
     required String password,
     String? image,
     String? username,
+    String? displayUsername,
   }) async {
     try {
       final response = await _dio.post(
         "/sign-up/email",
-        data: {"email": email, "password": password, "name": name, "image": image, "username": username},
+        data: {
+          "email": email,
+          "password": password,
+          "name": name,
+          "image": image,
+          "username": username,
+          "displayUsername": displayUsername,
+        }..removeWhere((key, value) => value == null),
       );
       final body = response.data;
       _setToken(body["token"]);
