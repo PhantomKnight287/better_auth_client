@@ -315,6 +315,26 @@ class BetterAuthClient<T extends User> {
     return cookieMap;
   }
 
+  /// Hydrate the user store by fetching the current session using the stored token.
+  ///
+  /// Returns the [SessionResponse] if a valid token exists, or `null` if
+  /// there is no token or the token is invalid/expired.
+  ///
+  /// This is useful for restoring the user's authentication state on app startup.
+  Future<SessionResponse<T>?> hydrate() async {
+    try {
+      final token = await tokenStore.getToken();
+      if (token.isEmpty) return null;
+      final response = await _dio.get(
+        "/get-session",
+        options: Options(headers: {"Authorization": "Bearer $token"}),
+      );
+      return SessionResponse.fromJson(response.data, _fromJsonUser);
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Get the session of the user.
   ///
   /// Calls [TokenStore.getToken] to get the token and adds it to the request headers.

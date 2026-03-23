@@ -1,3 +1,8 @@
+### 0.14.0
+
+- Added username plugin with sign-in support
+- Added `hydrate()` method to restore auth state from stored token
+
 ### 0.12.0
 
 - Added support for organization plugin
