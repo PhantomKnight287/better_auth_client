@@ -9,3 +9,4 @@ export 'models/response/user.dart';
 export 'models/response/social_sign_in_response.dart';
 export 'models/response/token_refresh.dart';
 export 'models/response/session_response.dart';
+export 'plugins/username.dart';

@@ -19,6 +19,7 @@ import 'package:better_auth_client/plugins/magic_link.dart';
 import 'package:better_auth_client/plugins/one_time_token/main.dart';
 import 'package:better_auth_client/plugins/phone_number.dart';
 import 'package:better_auth_client/plugins/two_factor.dart';
+import 'package:better_auth_client/plugins/username.dart';
 import 'package:better_auth_client/src/auth/signin.dart';
 import 'package:better_auth_client/models/token_store.dart';
 import 'package:better_auth_client/src/auth/signup.dart';
@@ -101,6 +102,11 @@ class BetterAuthClient<T extends User> {
   /// Requires [organization] plugin to be installed server side
   late final OrganizationPlugin organization;
 
+  /// The Username plugin
+  ///
+  /// Requires [username] plugin to be installed server side
+  late final UsernamePlugin<T> username;
+
   /// Function to convert JSON to a custom user model
   /// If not provided, the default User.fromJson will be used
   final T Function(Map<String, dynamic>) _fromJsonUser;
@@ -154,6 +160,9 @@ class BetterAuthClient<T extends User> {
           ..initialize(dio: _dio, getOptions: _getOptions, tokenStore: tokenStore, fromJsonUser: _fromJsonUser);
     organization =
         OrganizationPlugin()
+          ..initialize(dio: _dio, getOptions: _getOptions, tokenStore: tokenStore, fromJsonUser: _fromJsonUser);
+    username =
+        UsernamePlugin<T>()
           ..initialize(dio: _dio, getOptions: _getOptions, tokenStore: tokenStore, fromJsonUser: _fromJsonUser);
     // Initialize custom plugins
     for (final plugin in _customPlugins) {
