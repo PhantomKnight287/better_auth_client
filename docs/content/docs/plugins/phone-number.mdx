@@ -15,7 +15,7 @@ await client.phoneNumber.sendOTP(
 ```
 
 ### Verify Phone Number
-Verifies the phone number using the OTP sent to the user's phone.
+Verifies the phone number using the OTP sent to the user's phone. On success, the returned session token is automatically persisted via your `TokenStore`, so subsequent authenticated requests will include it through the client's auth interceptor — you don't need to call `tokenStore.saveToken` yourself.
 
 ```dart
 final response = await client.phoneNumber.verifyPhoneNumber(
