@@ -83,10 +83,22 @@ final client = BetterAuthClient(
 </Steps>
 
 
+### Hydrating Auth State
+
+On app startup, you can restore the user's session from the stored token using `hydrate()`. It returns the session if a valid token exists, or `null` otherwise.
+
+```dart
+final session = await client.hydrate();
+if (session != null) {
+  // User is authenticated
+  print(session.user.name);
+} else {
+  // No valid session, redirect to login
+}
+```
+
 ### Next steps
 
 The package's api is very similar to that of official better auth client, with some differences.
 
 Please refer to the sidebar for available methods.
-
-

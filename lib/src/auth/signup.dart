@@ -19,12 +19,14 @@ class Signup<T extends User> {
   /// [password] The password of the user
   /// [image] The image of the user
   /// [username] The username of the user
+  /// [displayUsername] The display username of the user
   Future<T> email({
     required String name,
     required String email,
     required String password,
     String? image,
     String? username,
+    String? displayUsername,
   }) async {
     try {
       final response = await _dio.post(
@@ -35,6 +37,7 @@ class Signup<T extends User> {
           "name": name,
           if (image != null) "image": image,
           if (username != null) "username": username,
+          if (displayUsername != null) "displayUsername": displayUsername,
         },
       );
       final body = response.data;

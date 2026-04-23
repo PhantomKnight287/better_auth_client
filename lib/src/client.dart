@@ -19,6 +19,7 @@ import 'package:better_auth_client/plugins/magic_link.dart';
 import 'package:better_auth_client/plugins/one_time_token/main.dart';
 import 'package:better_auth_client/plugins/phone_number.dart';
 import 'package:better_auth_client/plugins/two_factor.dart';
+import 'package:better_auth_client/plugins/username.dart';
 import 'package:better_auth_client/src/auth/signin.dart';
 import 'package:better_auth_client/models/token_store.dart';
 import 'package:better_auth_client/src/auth/signup.dart';
@@ -101,6 +102,11 @@ class BetterAuthClient<T extends User> {
   /// Requires [organization] plugin to be installed server side
   late final OrganizationPlugin organization;
 
+  /// The Username plugin
+  ///
+  /// Requires [username] plugin to be installed server side
+  late final UsernamePlugin<T> username;
+
   /// Function to convert JSON to a custom user model
   /// If not provided, the default User.fromJson will be used
   final T Function(Map<String, dynamic>) _fromJsonUser;
@@ -154,6 +160,9 @@ class BetterAuthClient<T extends User> {
           ..initialize(dio: _dio, getOptions: _getOptions, tokenStore: tokenStore, fromJsonUser: _fromJsonUser);
     organization =
         OrganizationPlugin()
+          ..initialize(dio: _dio, getOptions: _getOptions, tokenStore: tokenStore, fromJsonUser: _fromJsonUser);
+    username =
+        UsernamePlugin<T>()
           ..initialize(dio: _dio, getOptions: _getOptions, tokenStore: tokenStore, fromJsonUser: _fromJsonUser);
     // Initialize custom plugins
     for (final plugin in _customPlugins) {
@@ -304,6 +313,26 @@ class BetterAuthClient<T extends User> {
     }
 
     return cookieMap;
+  }
+
+  /// Hydrate the user store by fetching the current session using the stored token.
+  ///
+  /// Returns the [SessionResponse] if a valid token exists, or `null` if
+  /// there is no token or the token is invalid/expired.
+  ///
+  /// This is useful for restoring the user's authentication state on app startup.
+  Future<SessionResponse<T>?> hydrate() async {
+    try {
+      final token = await tokenStore.getToken();
+      if (token.isEmpty) return null;
+      final response = await _dio.get(
+        "/get-session",
+        options: Options(headers: {"Authorization": "Bearer $token"}),
+      );
+      return SessionResponse.fromJson(response.data, _fromJsonUser);
+    } catch (_) {
+      return null;
+    }
   }
 
   /// Get the session of the user.
