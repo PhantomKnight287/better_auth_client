@@ -127,6 +127,7 @@ class BetterAuthClient<T extends User> {
 
   void _internal() {
     _dio = generateDioClient(baseUrl);
+    _dio.interceptors.add(SetAuthTokenHeaderInterceptor(store: tokenStore));
     signUp = Signup<T>(dio: _dio, setToken: tokenStore.saveToken, fromJsonUser: _fromJsonUser);
     signIn = Signin<T>(
       dio: _dio,
