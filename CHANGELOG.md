@@ -1,3 +1,8 @@
+### 0.15.0
+
+- `PhoneNumberPlugin.verify` now persists the returned token via `TokenStore`
+- `BetterAuthClient` auto-attaches `SetAuthTokenHeaderInterceptor` on the shared Dio instance
+
 ### 0.14.0
 
 - Added username plugin with sign-in support

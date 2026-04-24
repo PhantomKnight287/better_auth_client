@@ -35,10 +35,10 @@ class Signup<T extends User> {
           "email": email,
           "password": password,
           "name": name,
-          "image": image,
-          "username": username,
-          "displayUsername": displayUsername,
-        }..removeWhere((key, value) => value == null),
+          if (image != null) "image": image,
+          if (username != null) "username": username,
+          if (displayUsername != null) "displayUsername": displayUsername,
+        },
       );
       final body = response.data;
       _setToken(body["token"]);

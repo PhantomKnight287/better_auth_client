@@ -3,6 +3,7 @@ import 'package:test/test.dart';
 
 class InMemoryTokenStore extends TokenStore {
   String? _token;
+  String? _adminToken;
 
   @override
   Future<String> getToken() {
@@ -12,6 +13,17 @@ class InMemoryTokenStore extends TokenStore {
   @override
   Future<void> saveToken(String? token) {
     _token = token;
+    return Future.value();
+  }
+
+  @override
+  Future<String> getAdminToken() {
+    return Future.value(_adminToken ?? "");
+  }
+
+  @override
+  Future<void> saveAdminToken(String? token) {
+    _adminToken = token;
     return Future.value();
   }
 }

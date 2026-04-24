@@ -49,7 +49,9 @@ class PhoneNumberPlugin<T extends User> extends BasePlugin<T> {
           "updatePhoneNumber": updatePhoneNumber,
         },
       );
-      return UserAndTokenResponse.fromJson(response.data);
+      final parsed = UserAndTokenResponse.fromJson(response.data);
+      await tokenStore.saveToken(parsed.token);
+      return parsed;
     } catch (e) {
       final message = getErrorMessage(e);
       if (message == null) rethrow;
