@@ -3,7 +3,11 @@ import 'package:dio/dio.dart';
 String dioErrorToMessage(DioException e) {
   switch (e.type) {
     case DioExceptionType.badResponse:
-      return e.response?.data?["message"] ?? "An unknown error occurred";
+      final data = e.response?.data;
+      if (data is Map) {
+        return data["message"]?.toString() ?? "An unknown error occurred";
+      }
+      return data?.toString() ?? "An unknown error occurred";
     case DioExceptionType.cancel:
       return "Request cancelled";
     case DioExceptionType.connectionError:
@@ -26,7 +30,11 @@ String? getErrorMessage(Object e) {
     if (e.response?.statusCode == 404) {
       return "Not found";
     }
-    return e.response?.data?['message'] ?? e.response?.data?['error'] ?? "An unknown error occurred";
+    final data = e.response?.data;
+    if (data is Map) {
+      return data['message']?.toString() ?? data['error']?.toString() ?? "An unknown error occurred";
+    }
+    return data?.toString() ?? "An unknown error occurred";
   }
   return null;
 }

@@ -1,3 +1,7 @@
+### 0.15.1
+
+- Fix `TypeError` in `dioErrorToMessage` and `getErrorMessage` when the response body is not a JSON object (e.g. HTML or plain text error pages)
+
 ### 0.15.0
 
 - `PhoneNumberPlugin.verify` now persists the returned token via `TokenStore`
