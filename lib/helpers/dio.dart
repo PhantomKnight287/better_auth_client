@@ -22,6 +22,8 @@ String dioErrorToMessage(DioException e) {
       return "Bad certificate";
     case DioExceptionType.connectionTimeout:
       return "Connection timeout";
+    case DioExceptionType.transformTimeout:
+      return "Transform timeout";
   }
 }
 

@@ -330,7 +330,9 @@ class BetterAuthClient<T extends User> {
         "/get-session",
         options: Options(headers: {"Authorization": "Bearer $token"}),
       );
-      return SessionResponse.fromJson(response.data, _fromJsonUser);
+      final data = response.data;
+      if (data == null || data is! Map<String, dynamic>) return null;
+      return SessionResponse.fromJson(data, _fromJsonUser);
     } catch (_) {
       return null;
     }
@@ -344,7 +346,11 @@ class BetterAuthClient<T extends User> {
   Future<SessionResponse<T>> getSession() async {
     try {
       final response = await _dio.get("/get-session", options: await _getOptions());
-      return SessionResponse.fromJson(response.data, _fromJsonUser);
+      final data = response.data;
+      if (data == null || data is! Map<String, dynamic>) {
+        throw Exception('Session not found or invalid response');
+      }
+      return SessionResponse.fromJson(data, _fromJsonUser);
     } catch (e) {
       final message = getErrorMessage(e);
       if (message == null) rethrow;
