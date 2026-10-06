@@ -1,3 +1,7 @@
+### 0.15.2
+
+- Add `DioExceptionType.transformTimeout` case in `dioErrorToMessage` for dio 5.10.0 compatibility
+
 ### 0.15.1
 
 - Fix `TypeError` in `dioErrorToMessage` and `getErrorMessage` when the response body is not a JSON object (e.g. HTML or plain text error pages)

@@ -10,7 +10,12 @@ class SessionResponse<T extends User> {
   SessionResponse({required this.session, required this.user});
 
   factory SessionResponse.fromJson(Map<String, dynamic> json, T Function(Map<String, dynamic>) fromJsonT) {
-    return SessionResponse(session: Session.fromJson(json['session']), user: fromJsonT(json['user']));
+    final sessionJson = json['session'];
+    final userJson = json['user'];
+    if (sessionJson is! Map<String, dynamic> || userJson is! Map<String, dynamic>) {
+      throw FormatException('Invalid session response: missing "session" or "user" field');
+    }
+    return SessionResponse(session: Session.fromJson(sessionJson), user: fromJsonT(userJson));
   }
 
   Map<String, dynamic> toJson() {
